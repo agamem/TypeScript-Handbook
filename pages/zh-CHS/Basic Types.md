@@ -64,63 +64,58 @@ var list: Array<number> = [1, 2, 3];
 
 # Tuple 元组
 
-Tuple types allow you to express an array where the type of a fixed number of elements is known, but need not be the same.
-For example, you may want to represent a value as a pair of a `string` and a `number`:
+元组类型允许表达固定数量的已知类型集合，但这些类型不必是相同的。例如，您可能想表示一个'string`和`number`组合的类型：
 
 ```ts
-// Declare a tuple type
+// 声明一个元组类型
 var x: [string, number];
-// Initialize it
-x = ['hello', 10]; // OK
-// Initialize it incorrectly
-x = [10, 'hello']; // Error
+// 初始化他
+x = ['hello', 10]; // 准确
+// 错误的初始化
+x = [10, 'hello']; // 错误
 ```
 
-When accessing an element with a known index, the correct type is retrieved:
+我们可以使用数字检索一个已知的元素，但需要注意类型正确。
 
 ```ts
-console.log(x[0].substr(1)); // OK
-console.log(x[1].substr(1)); // Error, 'number' does not have 'substr'
+console.log(x[0].substr(1)); // 正确
+console.log(x[1].substr(1)); // 错误，'number' 类型没有 'substr' 方法
 ```
 
-When accessing an element outside the set of known indices, a union type is used instead:
+当访问的索引超过边界时，将使用联合类型处理：
 
 ```ts
-x[3] = 'world'; // OK, string can be assigned to (string | number)
-console.log(x[5].toString()); // OK, 'string' and 'number' both have toString
-x[6] = true; // Error, boolean isn't (string | number)
+x[3] = 'world'; // 正确，string允许被分配到 (string | number)
+console.log(x[5].toString()); // 正确，'string' 和 'number' 都有 toString 方法
+x[6] = true; // 错误，布尔值不是 (string | number) 中的一种
 ```
 
-Union types are an advanced topic that we'll cover in a later chapter.
+联合类型是更高级的议题，我们会在后续的章节中介绍。
 
-# Enum
+# Enum 枚举
 
-A helpful addition to the standard set of datatypes from JavaScript is the `enum`.
-As in languages like C#, an enum is a way of giving more friendly names to sets of numeric values.
+TypeScript拓展了JavaScript原生的标准数据类型集，增加了枚举类型（enum）。枚举是一种很有用的数据类型，就像C#等语言中一样，它提供了一种给数字类型的值，设置易于辨别的名字的方法。
 
 ```ts
 enum Color {Red, Green, Blue};
 var c: Color = Color.Green;
 ```
 
-By default, enums begin numbering their members starting at `0`.
-You can change this by manually setting the value of one its members.
-For example, we can start the previous example at `1` instead of `0`:
+在默认情况下，枚举类型会从数字0开始标记它的元素。我们可以通过人为地设置元素的数值来改变默认值。例如，上面的例子我们可以设置成从1开始计数：
 
 ```ts
 enum Color {Red = 1, Green, Blue};
 var c: Color = Color.Green;
 ```
 
-Or, even manually set all the values in the enum:
+我们甚至可以给所有的枚举元素设置数值：
 
 ```ts
 enum Color {Red = 1, Green = 2, Blue = 4};
 var c: Color = Color.Green;
 ```
 
-A handy feature of enums is that you can also go from a numeric value to the name of that value in the enum.
-For example, if we had the value `2` but weren't sure what that mapped to in the `Color` enum above, we could look up the corresponding name:
+枚举类型有一个便捷特性，我们也可以直接用数值来查找其对应的枚举元素的名称。举例来说，如果我们有一个值为2,但我们不确定这个数值对应枚举类型中的哪个元素，那我们可以直接查找这个数值对应的名称：
 
 ```ts
 enum Color {Red = 1, Green, Blue};
@@ -129,12 +124,9 @@ var colorName: string = Color[2];
 alert(colorName);
 ```
 
-# Any
+# Any 
 
-We may need to describe the type of variables that we do not know when we are writing an application.
-These values may come from dynamic content, e.g. from the user or a 3rd party library.
-In these cases, we want to opt-out of type-checking and let the values pass through compile-time checks.
-To do so, we label these with the `any` type:
+当我们编写应用时，我们可能会需要描述一些类型不明确的变量。因为这些变量的值可能来源于一些动态的内容，如用户或第三方提供的库。在这种情况下，我们需要略过对这些变量进行的类型检查，让它们直接通过编译时的检查。为了实现这一目的，我们可以把它们标识为'any'类型：
 
 ```ts
 var notSure: any = 4;
@@ -142,20 +134,18 @@ notSure = "maybe a string instead";
 notSure = false; // okay, definitely a boolean
 ```
 
-The `any` type is a powerful way to work with existing JavaScript, allowing you to gradually opt-in and opt-out of type-checking during compilation.
-You might expect `Object` to play a similar role, as it does in other languages.
-But variables of type `Object` only allow you to assign any value to them -- you can't call arbitrary methods on them, even ones that actually exist:
+使用'any'类型是处理我们已有的JavaScript代码的一种强大的方式，我们可以用它来逐渐增加或减少在编译过程中的类型检查。
+就像其他编程语言那样，你可能期望使用`Object`来实现这个功能，但是注意在JavaScript中，`Object`类型仅仅允许分配任意值给他，但不能调用他的存在或可能的任何方法：
 
 ```ts
 var notSure: any = 4;
-notSure.ifItExists(); // okay, ifItExists might exist at runtime
-notSure.toFixed(); // okay, toFixed exists (but the compiler doesn't check)
+notSure.ifItExists(); // 没问题，在运行时有可能有 ifItExists 这个方法
+notSure.toFixed(); // 没问题，toFixed 是真实存在的方法 (但是编译器不会验证准确性)
 var prettySure: Object = 4;
-prettySure.toFixed(); // Error: Property 'toFixed' doesn't exist on type 'Object'.
+prettySure.toFixed(); // 错误，不行就是不行了，使用any吧
 ```
 
-The `any` type is also handy if you know some part of the type, but perhaps not all of it.
-For example, you may have an array but the array has a mix of different types:
+当我们知道一个类型的部分数据类型，却又不确定所有的数据类型时，使用'any'可以为我们提供不少方便。比如你有一个数组，但是这个数组中的元素属于不同的数据类型，那你可以这么做：
 
 ```ts
 var list: any[] = [1, true, "free"];
@@ -165,8 +155,7 @@ list[1] = 100;
 
 # Void
 
-`void` is a little like the opposite of `any`: the absence of having any type at all.
-You may commonly see this as the return type of functions that do not return a value:
+`void`就像`any`的相反面：void就是没有，any就是所有。没有返回值的函数就可以认为是'void'类型：
 
 ```ts
 function warnUser(): void {
@@ -174,13 +163,15 @@ function warnUser(): void {
 }
 ```
 
-Declaring variables of type `void` is not useful because you can only assign `undefined` or `null` to them:
+不建议声明一个变量是 `void`类型，因为这个变量就只能赋值`undefined` 或 `null`。
 
 ```ts
 var unusable: void = undefined;
 ```
 
 # 感谢翻译
-编写人生  https://github.com/MyErpSoft/TypeScript-Handbook
-ntesmail  https://github.com/ntesmail/Typescript-Handbook
-oyyd      https://github.com/oyyd/typescript-handbook-zh
+- oyyd      https://github.com/oyyd/typescript-handbook-zh
+- ntesmail  https://github.com/ntesmail/Typescript-Handbook
+- 编写人生  https://github.com/MyErpSoft/TypeScript-Handbook
+
+
