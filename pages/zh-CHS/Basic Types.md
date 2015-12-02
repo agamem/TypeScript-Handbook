@@ -1,21 +1,19 @@
 # Introduction
 
-For programs to be useful, we need to be able to work with some of the simplest units of data: numbers, strings, structures, boolean values, and the like.
-In TypeScript, we support much the same types as you would expected in JavaScript, with a convenient enumeration type thrown in to help things along.
+为了让程序更易用，我们兼容几种最基本的数据类型：numbers(数字)，strings(字符串)，structures(结构)，boolean(布尔值)等等。在 TypeScript 中，我们支持和 Javascript 几乎一样多的类型，并且新增了实用的枚举类型。
 
-# Boolean
+# Boolean 布尔值
 
-The most basic datatype is the simple true/false value, which JavaScript and TypeScript (as well as other languages) call a `boolean` value.
+最基础的数据类型就是简单的 true(真)/false(假) ，在 Javascript 和 TypeScript （以及其他语言）中被称作是 "boolean(布尔值)"。
 
 ```ts
 var isDone: boolean = false;
 ```
 
-# Number
+# Number 数字
 
-As in JavaScript, all numbers in TypeScript are floating point values.
-These floating point numbers get the type `number`.
-In addition to hexadecimal and decimal literals, TypeScript also supports binary and octal literals introduced in ECMAScript 2015.
+和 Javascript 一样，在 TypeScript 中所有的number都是浮点值。
+TypeScript 除了支持ECMAScript 2015中的十六进制和十进制外，还支持二进制和二进制类型。
 
 ```ts
 var decLiteral: number = 6;
@@ -24,19 +22,16 @@ var binaryLiteral: number = 0b0010;
 var octalLiteral: number = 0o74563;
 ```
 
-# String
+# String 字符串
 
-Another fundamental part of creating programs in JavaScript for webpages and servers alike is working with textual data.
-As in other languages, we use the type `string` to refer to these textual datatypes.
-Just like JavaScript, TypeScript also uses the double quote (`"`) or single quote (`'`) to surround string data.
+在使用JavaScript创建网页或应用程序时，要用到很基础的功能是处理字符串，和其他语言一样，我们使用 "string" 类型来表示那些文本数据。和 JavaScript 一样，TypeScript 也使用双引号或单引号来围绕字符串数据。
 
 ```ts
 var name: string = "bob";
 name = 'smith';
 ```
 
-You can also use *template strings*, which can span multiple lines and have embedded expressions.
-These strings are surrounded by the backtick/backquote (`` ` ``) character, and embedded expressions are of the form `${ expr }`
+你也可以使用 *模板字符串*，他能支持多行文本和内嵌表达式。这些字符串使用单引号(`` ` ``)包围，并且嵌入的表达式使用`${ expr }`这样的形式表示。
 
 ```ts
 var name: string = `Gene`;
@@ -46,30 +41,28 @@ var sentence: string = `Hello, my name is ${ name }.
 I'll be ${ age + 1 } years old next month.`
 ```
 
-This is equivalent to declaring `sentence` like so:
+上面的表达式相当于下面的声明方式：
 
 ```ts
 var sentence: string = "Hello, my name is " + name + ".\n\n" +
     "I'll be " + (age + 1) + " years old next month."
 ```
 
-# Array
+# Array 数组
 
-TypeScript, like JavaScript, allows you to work with arrays of values.
-Array types can be written in one of two ways.
-In the first, you use the type of the elements followed by `[]` to denote an array of that element type:
+TypeScript 和 Javascript 一样，允许你使用数组。数组类型的定义可以有两种写法。第一种写法，你在数组元素类型后面添加‘[]’来表示这是一个该类型的数组:
 
 ```ts
 var list: number[] = [1, 2, 3];
 ```
 
-The second way uses a generic array type, `Array<elemType>`:
+第二种写法使用一种通用的数组类型表示，Array<数组元素类型>:
 
 ```ts
 var list: Array<number> = [1, 2, 3];
 ```
 
-# Tuple
+# Tuple 元组
 
 Tuple types allow you to express an array where the type of a fixed number of elements is known, but need not be the same.
 For example, you may want to represent a value as a pair of a `string` and a `number`:
@@ -186,3 +179,8 @@ Declaring variables of type `void` is not useful because you can only assign `un
 ```ts
 var unusable: void = undefined;
 ```
+
+# 感谢翻译
+编写人生  https://github.com/MyErpSoft/TypeScript-Handbook
+ntesmail  https://github.com/ntesmail/Typescript-Handbook
+oyyd      https://github.com/oyyd/typescript-handbook-zh
