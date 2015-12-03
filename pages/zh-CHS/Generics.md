@@ -1,18 +1,18 @@
-# Introduction
+# 介绍
 
-A major part of software engineering is building components that not only have well-defined and consistent APIs, but are also reusable.
-Components that are capable of working on the data of today as well as the data of tomorrow will give you the most flexible capabilities for building up large software systems.
+软件工程中，我们不仅要创建一致的定义良好的API，同时也要考虑可重用性。
+组件不仅能够支持当前的数据类型，同时也能支持未来的数据类型，这在创建大型系统时为你提供了十分灵活的功能。
 
-In languages like C# and Java, one of the main tools in the toolbox for creating reusable components is 'generics', that is, being able to create a component that can work over a variety of types rather than a single one.
-This allows users to consume these components and use their own types.
+在像C#和Java这样的语言中，可以使用`泛型`来创建可重用的组件，一个组件可以支持多种类型的数据。
+这样用户就可以以自己的数据类型来使用组件。
 
-# Hello World of Generics
+# 泛型之Hello World
 
-To start off, let's do the "hello world" of generics: the identity function.
-The identity function is a function that will return back whatever is passed in.
-You can think of this in a similar way to the 'echo' command.
+下面来创建第一个使用泛型的例子：identity函数。
+这个函数会返回任何传入它的值。
+你可以把这个函数当成是`echo`命令。
 
-Without generics, we would either have to give the identity function a specific type:
+不用泛型的话，这个函数可能是下面这样：
 
 ```ts
 function identity(arg: number): number {
@@ -20,7 +20,7 @@ function identity(arg: number): number {
 }
 ```
 
-Or, we could describe the identity function using the `any` type:
+或者，我们使用`any`类型来定义函数：
 
 ```ts
 function identity(arg: any): any {
@@ -28,11 +28,11 @@ function identity(arg: any): any {
 }
 ```
 
-While using `any` is certainly generic in that will accept any and all types for the type of `arg`, we actually are losing the information about what that type was when the function returns.
-If we passed in a number, the only information we have is that any type could be returned.
+虽然使用`any`类型后这个函数已经能接收任何类型的arg参数，但是却丢失了一些信息：传入的类型与返回的类型应该是相同的。
+如果我们传入一个数字，我们只知道任何类型的值都有可能被返回。
 
-Instead, we need a way of capturing the type of the argument in such a way that we can also use it to denote what is being returned.
-Here, we will use a *type variable*, a special kind of variable that works on types rather than values.
+因此，我们需要一种方法使用返回值的类型与传入参数的类型是相同的。
+这里，我们使用了*类型变量*，它是一种特殊的变量，只用于表示类型而不是值。
 
 ```ts
 function identity<T>(arg: T): T {
@@ -40,38 +40,38 @@ function identity<T>(arg: T): T {
 }
 ```
 
-We've now added a type variable `T` to the identity function.
-This `T` allows us to capture the type the user provides (e.g. `number`), so that we can use that information later.
-Here, we use `T` again as the return type. On inspection, we can now see the same type is used for the argument and the return type.
-This allows us to traffic that type information in one side of the function and out the other.
+我们给identity添加了类型变量`T`。
+`T`帮助我们捕获用户传入的类型（比如：`number`），之后我们就可以使用这个类型。
+之后我们再次使用了`T`当做返回值类型。现在我们可以知道参数类型与返回值类型是相同的了。
+这允许我们跟踪函数里使用的类型的信息。
 
-We say that this version of the `identity` function is generic, as it works over a range of types.
-Unlike using `any`, it's also just as precise (ie, it doesn't lose any information) as the first `identity` function that used numbers for the argument and return type.
+我们把这个版本的`identity`函数叫做泛型，因为它可以适用于多个类型。
+不同于使用`any`，它不会丢失信息，像第一个例子那像保持准确性，传入数值类型并返回数值类型。
 
-Once we've written the generic identity function, we can call it in one of two ways.
-The first way is to pass all of the arguments, including the type argument, to the function:
+我们定义了泛型函数后，可以用两种方法使用。
+第一种是，传入所有的参数，包含类型参数：
 
 ```ts
 var output = identity<string>("myString");  // type of output will be 'string'
 ```
 
-Here we explicitly set `T` to be string as one of the arguments to the function call, denoted using the `<>` around the arguments rather than `()`.
+这里我们明确的指定了`T`是字符串类型，并做为一个参数传给函数，使用了`<>`括起来而不是`()`。
 
-The second way is also perhaps the most common. Here we use *type argument inference*, that is, we want the compiler to set the value of `T` for us automatically based on the type of the argument we pass in:
+第二种方法更普遍。利用了*类型推论*，编译器会根据传入的参数自动地帮助我们确定T的类型：
 
 ```ts
 var output = identity("myString");  // type of output will be 'string'
 ```
 
-Notice that we didn't have explicitly pass the type in the angle brackets (`<>`), the compiler just looked at the value `"myString"`, and set `T` to its type.
-While type argument inference can be a helpful tool to keep code shorter and more readable, you may need to explicitly pass in the type arguments as we did in the previous example when the compiler fails to infer the type, as may happen in more complex examples.
+注意我们并没用`<>`明确的指定类型，编译器看到了`myString`，把`T`设置为此类型。
+类型推论帮助我们保持代码精简和高可读性。如果编译器不能够自动地推断出类型的话，只能像上面那样明确的传入T的类型，在一些复杂的情况下，这是可能出现的。
 
-# Working with Generic Type Variables
+# 使用泛型变量
 
-When you begin to use generics, you'll notice that when you create generic functions like `identity`, the compiler will enforce that you use any generically typed parameters in the body of the function correctly.
-That is, that you actually treat these parameters as if they could be any and all types.
+使用泛型创建像`identity`这样的泛型函数时，编译器要求你在函数体必须正确的使用这个通用的类型。
+换句话说，你必须把这些参数当做是任意或所有类型。
 
-Let's take our `identity` function from earlier:
+看下之前`identity`例子：
 
 ```ts
 function identity<T>(arg: T): T {
@@ -79,8 +79,8 @@ function identity<T>(arg: T): T {
 }
 ```
 
-What if we want to also log the length of the argument `arg` to the console with each call?
-We might be tempted to write this:
+如果我们想同时打印出`arg`的长度。
+我们很可能会这样做：
 
 ```ts
 function loggingIdentity<T>(arg: T): T {
@@ -89,11 +89,11 @@ function loggingIdentity<T>(arg: T): T {
 }
 ```
 
-When we do, the compiler will give us an error that we're using the `.length` member of `arg`, but nowhere have we said that `arg` has this member.
-Remember, we said earlier that these type variables stand in for any and all types, so someone using this function could have passed in a `number` instead, which does not have a `.length` member.
+如果这么做，编译器会报错说我们使用了`arg`的`.length`属性，但是没有地方指明`arg`具有这个属性。
+记住，这些类型变量代表的是任意类型，所以使用这个函数的人可能传入的是个数字，而数字是没有`.length`属性的。
 
-Let's say that we've actually intended this function to work on arrays of `T` rather that `T` directly. Since we're working with arrays, the `.length` member should be available.
-We can describe this just like we would create arrays of other types:
+现在假设我们想操作`T`类型的数组而不直接是`T`。由于我们操作的是数组，所以`.length`属性是应该存在的。
+我们可以像创建其它数组一样创建这个数组：
 
 ```ts
 function loggingIdentity<T>(arg: T[]): T[] {
@@ -102,11 +102,11 @@ function loggingIdentity<T>(arg: T[]): T[] {
 }
 ```
 
-You can read the type of `loggingIdentity` as "the generic function `loggingIdentity` takes a type parameter `T`, and an argument `arg` which is an array of `T`s, and returns an array of `T`s."
-If we passed in an array of numbers, we'd get an array of numbers back out, as `T` would bind to `number`.
-This allows us to use our generic type variable `T` as part of the types we're working with, rather than the whole type, giving us greater flexibility.
+你可以这样理解`loggingIdentity`的类型：泛型函数`loggingIdentity`，接收类型参数`T`，和函数`arg`，它是个元素类型是`T`的数组，并返回元素类型是`T`的数组。
+如果我们传入数字数组，将返回一个数字数组，因为此时`T`的的类型为`number`。
+这可以让我们把泛型变量T当做类型的一部分使用，而不是整个类型，增加了灵活性。
 
-We can alternatively write the sample example this way:
+我们也可以这样实现上面的例子：
 
 ```ts
 function loggingIdentity<T>(arg: Array<T>): Array<T> {
@@ -115,15 +115,15 @@ function loggingIdentity<T>(arg: Array<T>): Array<T> {
 }
 ```
 
-You may already be familiar with this style of type from other languages.
-In the next section, we'll cover how you can create your own generic types like `Array<T>`.
+使用过其它语言的话，你可能对这种语法已经很熟悉了。
+在下一节，会介绍如何创建自定义泛型像`Array<T>`一样。
 
-# Generic Types
+# 泛型类型
 
-In previous sections, we created generic identity functions that worked over a range of types.
-In this section, we'll explore the type of the functions themselves and how to create generic interfaces.
+上一节，我们创建了identity通用函数，可以适用于不同的类型。
+在这节，我们研究一下函数本身的类型，以及如何创建泛型接口。
 
-The type of generic functions is just like those of non-generic functions, with the type parameters listed first, similarly to function declarations:
+泛型函数的类型与非泛型函数的类型没什么不同，只是有一个类型参数在最前面，像函数声明一样：
 
 ```ts
 function identity<T>(arg: T): T {
@@ -133,7 +133,7 @@ function identity<T>(arg: T): T {
 var myIdentity: <T>(arg: T) => T = identity;
 ```
 
-We could also have used a different name for the generic type parameter in the type, so long as the number of type variables and how the type variables are used line up.
+我们也可以使用不同的泛型参数名，只要在数量上和使用方式上能对应上就可以。
 
 ```ts
 function identity<T>(arg: T): T {
@@ -143,7 +143,7 @@ function identity<T>(arg: T): T {
 var myIdentity: <U>(arg: U) => U = identity;
 ```
 
-We can also write the generic type as a call signature of an object literal type:
+我们还可以使用带有调用签名的对象字面量来定义泛型函数：
 
 ```ts
 function identity<T>(arg: T): T {
@@ -153,8 +153,8 @@ function identity<T>(arg: T): T {
 var myIdentity: {<T>(arg: T): T} = identity;
 ```
 
-Which leads us to writing our first generic interface.
-Let's take the object literal from the previous example and move it to an interface:
+这引导我们去写第一个泛型接口了。
+我们把上面例子里的对象字面量拿出来做为一个接口：
 
 ```ts
 interface GenericIdentityFn {
@@ -168,9 +168,9 @@ function identity<T>(arg: T): T {
 var myIdentity: GenericIdentityFn = identity;
 ```
 
-In a similar example, we may want to move the generic parameter to be a parameter of the whole interface.
-This lets us see what type(s) we're generic over (e.g. `Dictionary<string>` rather than just `Dictionary`).
-This makes the type parameter visible to all the other members of the interface.
+一个相似的例子，我们可能想把泛型参数当作整个接口的一个参数。
+这样我们就能清楚的知道使用的具体是哪个泛型类型（比如：`Dictionary<string>而不只是Dictionary`）。
+这样接口里的其它成员也能知道这个参数的类型了。
 
 ```ts
 interface GenericIdentityFn<T> {
@@ -184,18 +184,18 @@ function identity<T>(arg: T): T {
 var myIdentity: GenericIdentityFn<number> = identity;
 ```
 
-Notice that our example has changed to be something slightly different.
-Instead of describing a generic function, we now have a non-generic function signature that is a part of a generic type.
-When we use `GenericIdentityFn`, we now will also need to specify the corresponding type argument (here: `number`), effectively locking in what the underlying call signature will use.
-Understanding when to put the type parameter directly on the call signature and when to put it on the interface itself will be helpful in describing what aspects of a type are generic.
+注意，我们的示例做了少许改动。
+不再描述泛型函数，而是把非泛型函数签名作为泛型类型一部分。
+当我们使用`GenericIdentityFn`的时候，还得传入一个类型参数来指定泛型类型（这里是：`number`），锁定了之后代码里使用的类型。
+理解何时把参数放在调用签名里和何时放在接口上是很有帮助的，对于描述哪部分类型属于泛型部分来说。
 
-In addition to generic interfaces, we can also create generic classes.
-Note that it is not possible to create generic enums and namespaces.
+除了泛型接口，我们还可以创建泛型类。
+注意，无法创建枚举泛型和命名空间泛型。
 
-# Generic Classes
+# 泛型类
 
-A generic class has a similar shape to a generic interface.
-Generic classes have a generic type parameter list in angle brackets (`<>`) following the name of the class.
+泛型类看上去与泛型接口差不多。
+泛型类使用（`<>`）括起泛型类型，跟在类名后面。
 
 ```ts
 class GenericNumber<T> {
@@ -208,8 +208,8 @@ myGenericNumber.zeroValue = 0;
 myGenericNumber.add = function(x, y) { return x + y; };
 ```
 
-This is a pretty literal use of the `GenericNumber` class, but you may have noticed that nothing is restricting is to only use the `number` type.
-We could have instead used `string` or even more complex objects.
+`GenericNumber`类的使用是十分直观的，并且你应该注意到了我们并不限制只能使用数字类型。
+也可以使用字符串或其它更复杂的类型。
 
 ```ts
 var stringNumeric = new GenericNumber<string>();
@@ -219,15 +219,15 @@ stringNumeric.add = function(x, y) { return x + y; };
 alert(stringNumeric.add(stringNumeric.zeroValue, "test"));
 ```
 
-Just as with interface, putting the type parameter on the class itself lets us make sure all of the properties of the class are working with the same type.
+与接口一样，直接把泛型类型放在类后面，可以帮助我们确认类的所有属性都在使用相同的类型。
 
-As we covered in [Classes|Classes in TypeScript], a class has two side to its type: the static side and the instance side.
-Generic classes are only generic over their instance side rather than their static side, so when working with classes, static members can not use the class's type parameter.
+我们在[类](./Classes.md)那节说过，类有两部分：静态部分和实例部分。
+泛型类指的是实例部分的类型，所以类的静态属性不能使用这个泛型类型。
 
-# Generic Constraints
+# 泛型约束
 
-If you remember from an earlier example, you may sometimes want to write a generic function that works on a set of types where you have some knowledge about what capabilities that set of types will have.
-In our `loggingIdentity` example, we wanted to be able access the `.length` property of `arg`, but the compiler could not prove that every type had a `.length` property, so it warns us that we can't make this assumption.
+你应该会记得之前的一个例子，我们有时候想操作某类型的一组值，并且我们知道这组值具有什么样的属性。
+在`loggingIdentity`例子中，我们想访问`arg`的`length`属性，但是编译器并不能证明每种类型都有`length`属性，所以就报错了。
 
 ```ts
 function loggingIdentity<T>(arg: T): T {
@@ -236,12 +236,12 @@ function loggingIdentity<T>(arg: T): T {
 }
 ```
 
-Instead of working with any and all types, we'd like to constrain this function to work with any and all types that also have the `.length` property.
-As long as the type has this member, we'll allow it, but it's required to have at least this member.
-To do so, we must list our requirement as a constraint on what T can be.
+相比于操作any所有类型，我们想要限制函数去处理任意带有`.length`属性的所有类型。
+只要传入的类型有这个属性，我们就允许，就是说至少包含这一属性。
+为此，我们需要列出对于T的约束要求。
 
-To do so, we'll create an interface that describes our constraint.
-Here, we'll create an interface that has a single `.length` property and then we'll use this interface and the `extends` keyword to denote our constraint:
+为此，我们定义一个接口来描述约束条件。
+创建一个包含`.length`属性的接口，使用这个接口和`extends`关键字还实现约束：
 
 ```ts
 interface Lengthwise {
@@ -254,21 +254,21 @@ function loggingIdentity<T extends Lengthwise>(arg: T): T {
 }
 ```
 
-Because the generic function is now constrained, it will no longer work over any and all types:
+现在这个泛型函数被定义了约束，因此它不再是适用于任意类型：
 
 ```ts
 loggingIdentity(3);  // Error, number doesn't have a .length property
 ```
 
-Instead, we need to pass in values whose type has all the required properties:
+我们需要传入符合约束类型的值，必须包含必须的属性：
 
 ```ts
 loggingIdentity({length: 10, value: 3});
 ```
 
-## Using Type Parameters in Generic Constraints
+## 在泛型约束中使用类型参数
 
-In some cases, it may be useful to declare a type parameter that is constrained by another type parameter. For example,
+有时候，我们需要使用类型参数去约束另一个类型参数。比如，
 
 ```ts
 function find<T, U extends Findable<T>>(n: T, s: U) {   // errors because type parameter used in constraint
@@ -277,7 +277,7 @@ function find<T, U extends Findable<T>>(n: T, s: U) {   // errors because type p
 find (giraffe, myAnimals);
 ```
 
-You can achieve the pattern above by replacing the type parameter with its constraint. Rewriting the example above,
+可以通过下面的方法来实现，重写上面的代码，
 
 ```ts
 function find<T>(n: T, s: Findable<T>) {
@@ -286,11 +286,11 @@ function find<T>(n: T, s: Findable<T>) {
 find(giraffe, myAnimals);
 ```
 
-*Note:* The above is not strictly identical, as the return type of the first function could have returned `U`, which the second function pattern does not provide a means to do.
+*注意：* 上面两种写法并不完全等同，因为第一段程序的返回值可能是U，而第二段程序却没有这一限制。
 
-## Using Class Types in Generics
+## 在泛型里使用类类型
 
-When creating factories in TypeScript using generics, it is necessary to refer to class types by their constructor functions. For example,
+在TypeScript使用泛型创建工厂函数时，需要引用构造函数的类类型。比如，
 
 ```ts
 function create<T>(c: {new(): T; }): T {
@@ -298,7 +298,7 @@ function create<T>(c: {new(): T; }): T {
 }
 ```
 
-A more advanced example uses the prototype property to infer and constrain relationships between the constructor function and the instance side of class types.
+一个更高级的例子，使用原型属性推断并约束构造函数与类实例的关系。
 
 ```ts
 class BeeKeeper {
@@ -329,3 +329,6 @@ function findKeeper<A extends Animal, K> (a: {new(): A;
 
 findKeeper(Lion).nametag;  // typechecks!
 ```
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

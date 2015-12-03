@@ -1,9 +1,9 @@
-# Introduction
+# 介绍
 
-Type compatibility in TypeScript is based on structural subtyping.
-Structural typing is a way of relating types based solely on their members.
-This is in contrast with nominal typing.
-Consider the following code:
+TypeScript里的类型兼容性基于结构子类型的。
+结构类型是只一种只使用其成员来描述类型的方式。
+它正好与名义类型形成对比。
+看下面的例子：
 
 ```ts
 interface Named {
@@ -19,18 +19,17 @@ var p: Named;
 p = new Person();
 ```
 
-In nominally-typed languages like C# or Java, the equivalent code would be an error because the `Person` class does not explicitly describe itself as being an implementor of the `Named` interface.
+在使用名义类型的语言，比如C#或Java中，这段代码会报错，因为Person类没有明确说明其实现了Named接口。
 
-TypeScript's structural type system was designed based on how JavaScript code is typically written.
-Because JavaScript widely uses anonymous objects like function expressions and object literals, it's much more natural to represent the kinds of relationships found in JavaScript libraries with a structural type system instead of a nominal one.
+TypeScript的结构性子类型是根据JavaScript代码的典型写法来设计的。
+因为JavaScript里广泛地使用匿名对象，例如函数表达式和对象字面量，所以使用结构类型系统来描述这些类型比使用名义类型系统更好。
 
-## A Note on Soundness
+## 关于可靠性的注意事项
 
-TypeScript's type system allows certain operations that can't be known at compile-time to be safe. When a type system has this property, it is said to not be "sound". The places where TypeScript allows unsound behavior were carefully considered, and throughout this document we'll explain where these happen and the motivating scenarios behind them.
+TypeScript的类型系统允许一些在编译阶段无法否认其安全性的操作。当一个类型系统具此属性时，被当做是“不可靠”的。TypeScript允许这种不可靠行为的发生是经过仔细考虑的。通过这篇文章，我们会解释什么时候会发生这种情况和其有利的一面。
 
-# Starting out
-
-The basic rule for TypeScript's structural type system is that `x` is compatible with `y` if `y` has at least the same members as `x`. For example:
+# 开始
+TypeScript结构化类型系统的基本规则是，如果`x`要兼容`y`，那么`y`至少具有与`x`相同的属性。比如：
 
 ```ts
 interface Named {
@@ -43,10 +42,10 @@ var y = { name: 'Alice', location: 'Seattle' };
 x = y;
 ```
 
-To check whether `y` can be assigned to `x`, the compiler checks each property of `x` to find a corresponding compatible property in `y`.
-In this case, `y` must have a member called `name` that is a string. It does, so the assignment is allowed.
+这里要检查`y`是否能赋值给`x`，编译器检查`x`中的每个属性，看是否能在`y`中也找到对应属性。
+在这个例子中，`y`必须包含名字是`name`的`string`类型成员。`y`满足条件，因此赋值正确。
 
-The same rule for assignment is used when checking function call arguments:
+检查函数参数时使用相同的规则：
 
 ```ts
 function greet(n: Named) {
@@ -55,15 +54,15 @@ function greet(n: Named) {
 greet(y); // OK
 ```
 
-Note that `y` has an extra `location` property, but this does not create an error.
-Only members of the target type (`Named` in this case) are considered when checking for compatibility.
+注意，`y`有个额外的`location`属性，但这不会引发错误。
+只有目标类型（这里是`Named`）的成员会被一一检查是否兼容。
 
-This comparison process proceeds recursively, exploring the type of each member and sub-member.
+这个比较过程是递归进行的，检查每个成员及子成员。
 
-# Comparing two functions
+# 比较两个函数
 
-While comparing primitive types and object types is relatively straightforward, the question of what kinds of functions should be considered compatible.
-Let's start with a basic example of two functions that differ only in their argument lists:
+比较原始类型和对象类型时是容易理解的，问题是如何判断两个函数是兼容的。
+让我们以两个函数开始，它们仅有参数列表不同：
 
 ```ts
 var x = (a: number) => 0;
@@ -73,17 +72,17 @@ y = x; // OK
 x = y; // Error
 ```
 
-To check if `x` is assignable to `y`, we first look at the parameter list.
-Each parameter in `x` must have a corresponding parameter in `y` with a compatible type.
-Note that the names of the parameters are not considered, only their types.
-In this case, every parameter of `x` has a corresponding compatible parameter in `y`, so the assignment is allowed.
+要查看`x`是否能赋值给`y`，首先看它们的参数列表。
+`x`的每个参数必须能在`y`里找到对应类型的参数。
+注意的是参数的名字相同与否无所谓，只看它们的类型。
+这里，`x`的每个参数在`y`中都能找到对应的参数，所以允许赋值。
 
-The second assignment is an error, because y has a required second parameter that 'x' does not have, so the assignment is disallowed.
+第二个赋值错误，因为`y`有个必需的第二个参数，但是`x`并没有，所以不允许赋值。
 
-You may be wondering why we allow 'discarding' parameters like in the example `y = x`.
-The reason for this assignment to be allowed is that ignoring extra function parameters is actually quite common in JavaScript.
-For example, `Array#forEach` provides three arguments to the callback function: the array element, its index, and the containing array.
-Nevertheless, it's very useful to provide a callback that only uses the first argument:
+你可能会疑惑为什么允许`忽略`参数，像例子`y = x`中那样。
+原因是忽略额外的参数在JavaScript里是很常见的。
+例如，`Array#forEach`给回调函数传3个参数：数组元素，索引和整个数组。
+尽管如此，传入一个只使用第一个参数的回调函数也是很有用的：
 
 ```ts
 var items = [1, 2, 3];
@@ -92,10 +91,10 @@ var items = [1, 2, 3];
 items.forEach((item, index, array) => console.log(item));
 
 // Should be OK!
-items.forEach(item => console.log(item));
+items.forEach((item) => console.log(item));
 ```
 
-Now let's look at how return types are treated, using two functions that differ only by their return type:
+下面来看看如何处理返回值类型，创建两个仅是返回值类型不同的函数：
 
 ```ts
 var x = () => ({name: 'Alice'});
@@ -105,13 +104,12 @@ x = y; // OK
 y = x; // Error because x() lacks a location property
 ```
 
-The type system enforces that the source function's return type be a subtype of the target type's return type.
+类型系统强制源函数的返回值类型必须是目标函数返回值类型的子类型。
 
-## Function Argument Bivariance
-
-When comparing the types of function parameters, assignment succeeds if either the source parameter is assignable to the target parameter, or vice versa.
-This is unsound because a caller might end up being given a function that takes a more specialized type, but invokes the function with a less specialized type.
-In practice, this sort of error is rare, and allowing this enables many common JavaScript patterns. A brief example:
+## 函数参数双向协变
+当比较函数参数类型时，只有当源函数参数能够赋值给目标函数或者反过来时才能赋值成功。
+这是不稳定的，因为调用者可能传入了一个具有更精确类型信息的函数，但是调用这个传入的函数的时候却使用了不是那么精确的类型信息。
+实际上，这极少会发生错误，并且能够实现很多JavaScript里的常见模式。例如：
 
 ```ts
 enum EventType { Mouse, Keyboard }
@@ -135,16 +133,15 @@ listenEvent(EventType.Mouse, <(e: Event) => void>((e: MouseEvent) => console.log
 listenEvent(EventType.Mouse, (e: number) => console.log(e));
 ```
 
-## Optional Arguments and Rest Arguments
+## 可选参数及剩余参数
+比较函数兼容性的时候，可选参数与必须参数是可交换的。
+原类型上额外的可选参数并不会造成错误，目标类型的可选参数没有对应的参数也不是错误。
 
-When comparing functions for compatibility, optional and required parameters are interchangeable.
-Extra optional parameters of the source type are not an error, and optional parameters of the target type without corresponding parameters in the target type are not an error.
+当一个函数有剩余参数时，它被当做无限个可选参数。
 
-When a function has a rest parameter, it is treated as if it were an infinite series of optional parameters.
+这对于类型系统来说是不稳定的，但从运行时的角度来看，可选参数一般来说是不强制的，因为对于大多数函数来说相当于传递了一些`undefinded`。
 
-This is unsound from a type system perspective, but from a runtime point of view the idea of an optional parameter is generally not well-enforced since passing `undefined` in that position is equivalent for most functions.
-
-The motivating example is the common pattern of a function that takes a callback and invokes it with some predictable (to the programmer) but unknown (to the type system) number of arguments:
+有一个好的例子，常见的函数接收一个回调函数并用对于程序员来说是可预知的参数但对类型系统来说是不确定的参数来调用：
 
 ```ts
 function invokeLater(args: any[], callback: (...args: any[]) => void) {
@@ -158,15 +155,15 @@ invokeLater([1, 2], (x, y) => console.log(x + ', ' + y));
 invokeLater([1, 2], (x?, y?) => console.log(x + ', ' + y));
 ```
 
-## Functions with overloads
+## 函数重载
 
-When a function has overloads, each overload in the source type must be matched by a compatible signature on the target type.
-This ensures that the target function can be called in all the same situations as the source function.
-Functions with specialized overload signatures (those that use string literals in their overloads) do not use their specialized signatures when checking for compatibility.
+对于有重载的函数，源函数的每个重载都要在目标函数上找到对应的函数签名。
+这确保了目标函数可以在所有源函数可调用的地方调用。
+对于特殊的函数重载签名不会用来做兼容性检查。
 
-# Enums
+# 枚举
 
-Enums are compatible with numbers, and numbers are compatible with enums. Enum values from different enum types are considered incompatible. For example,
+枚举类型与数字类型兼容，并且数字类型与枚举类型兼容。不同枚举类型之间是不兼容的。比如，
 
 ```ts
 enum Status { Ready, Waiting };
@@ -176,11 +173,11 @@ var status = Status.Ready;
 status = Color.Green;  //error
 ```
 
-# Classes
+# 类
 
-Classes work similarly to object literal types and interfaces with one exception: they have both a static and an instance type.
-When comparing two objects of a class type, only members of the instance are compared.
-Static members and constructors do not affect compatibility.
+类与对象字面量和接口差不多，但有一点不同：类有静态部分和实例部分的类型。
+比较两个类类型的对象时，只有实例的成员会被比较。
+静态成员和构造函数不在比较的范围内。
 
 ```ts
 class Animal {
@@ -200,16 +197,15 @@ a = s;  //OK
 s = a;  //OK
 ```
 
-## Private and protected members in classes
+## 类的私有成员
 
-Private and protected members in a class affect their compatibility.
-When an instance of a class is checked for compatibility, if the instance contains a private member, then the target type must also contain a private member that originated from the same class.
-Likewise, the same applies for an instance with a protected member.
-This allows a class to be assignment compatible with its super class, but *not* with classes from a different inheritance hierarchy which otherwise have the same shape.
+私有成员会影响兼容性判断。
+当类的实例用来检查兼容时，如果它包含一个私有成员，那么目标类型必须包含来自同一个类的这个私有成员。
+这允许子类赋值给父类，但是不能赋值给其它有同样类型的类。
 
-# Generics
+# 泛型
 
-Because TypeScript is a structural type system, type parameters only affect the resulting type when consumed as part of the type of a member. For example,
+因为TypeScript是结构性的类型系统，类型参数只影响使用其做为类型一部分的结果类型。比如，
 
 ```ts
 interface Empty<T> {
@@ -220,8 +216,8 @@ var y: Empty<string>;
 x = y;  // okay, y matches structure of x
 ```
 
-In the above, `x` and `y` are compatible because their structures do not use the type argument in a differentiating way.
-Changing this example by adding a member to `Empty<T>` shows how this works:
+上面代码里，`x`和`y`是兼容的，因为它们的结构使用类型参数时并没有什么不同。
+把这个例子改变一下，增加一个成员，就能看出是如何工作的了：
 
 ```ts
 interface NotEmpty<T> {
@@ -233,12 +229,12 @@ var y: NotEmpty<string>;
 x = y;  // error, x and y are not compatible
 ```
 
-In this way, a generic type that has its type arguments specified acts just like a non-generic type.
+在这里，泛型类型在使用时就好比不是一个泛型类型。
 
-For generic types that do not have their type arguments specified, compatibility is checked by specifying `any` in place of all unspecified type arguments.
-The resulting types are then checked for compatibility, just as in the non-generic case.
+对于没指定泛型类型的泛型参数时，会把所有泛型参数当成`any`比较。
+然后用结果类型进行比较，就像上面第一个例子。
 
-For example,
+比如，
 
 ```ts
 var identity = function<T>(x: T): T {
@@ -252,14 +248,17 @@ var reverse = function<U>(y: U): U {
 identity = reverse;  // Okay because (x: any)=>any matches (y: any)=>any
 ```
 
-# Advanced Topics
+# 高级主题
 
-## Subtype vs Assignment
+## 子类型与赋值
 
-So far, we've used 'compatible', which is not a term defined in the language spec.
-In TypeScript, there are two kinds of compatibility: subtype and assignment.
-These differ only in that assignment extends subtype compatibility with rules to allow assignment to and from `any` and to and from enum with corresponding numeric values.
+目前为止，我们使用了`兼容性`，它在语言规范里没有定义。
+在TypeScript里，有两种类型的兼容性：子类型与赋值。
+它们的不同点在于，赋值扩展了子类型兼容，允许给`any`赋值或从`any`取值和允许数字赋值给枚举类型或枚举类型赋值给数字。
 
-Different places in the language use one of the two compatibility mechanisms, depending on the situation.
-For practical purposes, type compatibility is dictated by assignment compatibility even in the cases of the `implements` and `extends` clauses.
-For more information, see the [TypeScript spec](|http://go.microsoft.com/fwlink/?LinkId=267121).
+语言里的不同地方分别使用了它们之中的机制。
+实际上，类型兼容性是由赋值兼容性来控制的甚至在`implements`和`extends`语句里。
+更多信息，请参阅[TypeScript语言规范](http://go.microsoft.com/fwlink/?LinkId=267121).
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

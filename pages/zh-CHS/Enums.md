@@ -1,7 +1,7 @@
-# Enums
+# 枚举
 
-Enums allow us to define a set of named numeric constants.
-An enum can be defined using the `enum` keyword.
+使用枚举我们可以定义一些有名字的数字常量。
+枚举通过使用`enum`关键字定义。
 
 ```ts
 enum Direction {
@@ -12,26 +12,27 @@ enum Direction {
 }
 ```
 
-The body of an enum consists of zero or more enum members.
-Enum members have numeric value associated with them and can be either *constant* or *computed*.
-An enum member is considered constant if:
+一个枚举类型可以包含零个或多个枚举成员。
+枚举成员具有一个数字值，它们可以是*常数*或*通过计算得出的值*
+当满足如下条件时，枚举成员被当成是常数：
 
-* It does not have an initializer and the preceding enum member was constant.
-    In this case the value of the current enum member will be the value of the preceding enum member plus one.
-    One exception to this rule is the first element on an enum.
-    If it does not have initializer it is assigned the value `0`.
-* The enum member is initialized with a constant enum expression.
-    A constant enum expression is a subset of TypeScript expressions that can be fully evaluated at compile time.
-    An expression is a constant enum expression if it is either:
-    * numeric literal
-    * reference to previously defined constant enum member (it can be defined in different enum).
-        If member is defined in the same enum it can be referenced using unqualified name.
+* 不具有初始化函数并且前面的枚举成员是常数。
+    在这种情况下，当前枚举成员的值为上一个枚举成员的值加1。
+    一个例外情况就是枚举的第一个元素。
+    如果它没有初始化方法，那么它的初始值为`0`。
+* 枚举成员使用常数枚举表达式初始化。
+    常数枚举表达式是TypeScript表达式的子集，完全可以在编译阶段求值。
+    当一个表达式满足下面条件之一时，它就是一个常数枚举表达式：
+    * 数字字面量
+    * 引用前面定义的常数枚举成员（可以是在不同的枚举类型中定义的）
+        如果这个成员是在同一个枚举类型中定义的，可以使用非限定名引用。
     * parenthesized constant enum expression
-    * `+`, `-`, `~` unary operators applied to constant enum expression
-    * `+`, `-`, `*`, `/`, `%`, `<<`, `>>`, `>>>`, `&`, `|`, `^` binary operators with constant enum expressions as operands
-    It is a compile time error for constant enum expressions to be evaluated to `NaN` or `Infinity`.
+    * 带括号的常数枚举表达式
+    * `+`, `-`, `~` 一元运算符应用到常数枚举表达式
+    * `+`, `-`, `*`, `/`, `%`, `<<`, `>>`, `>>>`, `&`, `|`, `^` 二元运算符，常数枚举表达式做为一个操作对象
+    若常数枚举表达式求值后为`NaN`或`Infinity`，会在编译阶段报错。
 
-In all other cases enum member is considered computed.
+所有其它情况的枚举成员被当成需要计算的。
 
 ```ts
 enum FileAccess {
@@ -45,8 +46,8 @@ enum FileAccess {
 }
 ```
 
-Enums are real objects that exist at runtime.
-One reason is the ability to maintain a reverse mapping from enum values to enum names.
+枚举是在运行时真正存在的对象。
+其中一个原因是可以从枚举值到枚举名进行反射映射。
 
 ```ts
 enum Enum {
@@ -56,7 +57,7 @@ let a = Enum.A;
 let nameOfA = Enum[Enum.A]; // "A"
 ```
 
-is compiled to:
+编译成：
 
 ```js
 var Enum;
@@ -67,12 +68,12 @@ var a = Enum.A;
 var nameOfA = Enum[Enum.A]; // "A"
 ```
 
-In generated code an enum is compiled into an object that stores both forward (`name` -> `value`) and reverse (`value` -> `name`) mappings.
-References to enum members are always emitted as property accesses and never inlined.
-In lots of cases this is a perfectly valid solution.
-However sometimes requirements are tighter.
-To avoid paying the cost of extra generated code and additional indirection when accessing enum values it is possible to use const enums.
-Const enums are defined using the `const` modifier that precedes the `enum` keyword.
+生成的代码中，枚举类型被编译成一个对象，它包含双向的映射（`name` -> `value`）和（`value` -> `name`）。
+引用枚举成员总会生成一个属性访问并且永远不会内联。
+在大多数情况下这是很完美并正确的解决方案。
+然而有时候需求却比较严格。
+当访问枚举值时，为了避免生成多余的代码和间接引用，可以使用常数枚举。
+常数枚举是在`enum`关键字前使用`const`修饰符。
 
 ```ts
 const enum Enum {
@@ -81,9 +82,9 @@ const enum Enum {
 }
 ```
 
-Const enums can only use constant enum expressions and unlike regular enums they are completely removed during compilation.
-Const enum members are inlined at use sites.
-This is possible since const enums cannot have computed members.
+常数枚举只能使用常数枚举表达式并且不同于常规的枚举，它们在编译阶段会被删除。
+常数枚举成员在使用的地方被内联起来。
+这是因为常数枚举不可能有计算成员。
 
 ```ts
 const enum Directions {
@@ -96,15 +97,15 @@ const enum Directions {
 let directions = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
 ```
 
-in generated code will become
+生成后的代码为：
 
 ```js
 var directions = [0 /* Up */, 1 /* Down */, 2 /* Left */, 3 /* Right */];
 ```
 
-# Ambient enums
+# 外部枚举
 
-Ambient enums are used to describe the shape of already existing enum types.
+外部枚举用来描述已经存在的枚举类型的形状。
 
 ```ts
 declare enum Enum {
@@ -114,5 +115,8 @@ declare enum Enum {
 }
 ```
 
-One important difference between ambient and non-ambient enums is that, in regular enums, members that don't have an initializer are considered constant members.
-For non-const ambient enums member that does not have initializer is considered computed.
+外部枚举和非外部枚举之间有一个重要的区别，在正常的枚举里，没有初始化方法的成员被当成常数成员。
+对于非常数的外部枚举而言，没有初始化方法时被当做需要经过计算的。
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

@@ -1,14 +1,14 @@
-# Introduction
+# 介绍
 
-With the introduction of Classes in TypeScript and ES6, there now exist certain scenarios that require additional features to support annotating or modifying classes and class members.
-Decorators provide a way to add both annotations and a meta-programming syntax for class declarations and members.
-Decorators are a [stage 1 proposal](https://github.com/wycats/javascript-decorators/blob/master/README.md) for JavaScript and are available as an experimental feature of TypeScript.
+随着TypeScript和ES6里引入了类，现在在一些场景下我们会需要额外的特性来支持注解或修改类和类成员。
+Decorators提供了一种方式来添加注解和在类的声明和成员上使用元编程语法。
+Javascript里的Decorators目前处在[建议征集的第一阶段](https://github.com/wycats/javascript-decorators/blob/master/README.md)，在TypeScript里做为实验性特性已经提供了支持。
 
-> NOTE&emsp; Decorators are an experimental feature that may change in future releases.
+> 注意&emsp; Decorators是实验性的特性，在未来的版本中可能会发生改变。
 
-To enable experimental support for decorators, you must enable the `experimentalDecorators` compiler option either on the command line or in your `tsconfig.json`:
+若要启用实验性的decorator，你必须启用`experimentalDecorators`编译器选项，在命令行中或在`tsconfig.json`：
 
-**Command Line**:
+**命令行**:
 
 ```shell
 tsc --target ES5 --experimentalDecorators
@@ -25,12 +25,12 @@ tsc --target ES5 --experimentalDecorators
 }
 ```
 
-# Decorators
+# Decorators （后文译作装饰器）
 
-A *Decorator* is a special kind of declaration that can be attached to a [class declaration](#class-decorators), [method](#method-decorators), [accessor](#accessor-decorators), [property](#property-decorators), or [parameter](#parameter-decorators).
-Decorators use the form `@expression`, where `expression` must evaluate to a function that will be called at runtime with information about the decorated declaration.
+*装饰器*是一种特殊类型的声明，它能够被附加到[类装饰器](#class-decorators)，[方法](#method-decorators)，[访问符](#accessor-decorators)，[属性](#property-decorators)，或 [参数](#parameter-decorators)上。
+装饰器利用`@expression`这种方式，`expression`求值后必须为一个函数，它使用被装饰的声明信息在运行时被调用。
 
-For example, given the decorator `@sealed` we might write the `sealed` function as follows:
+例如，有一个`@sealed`装饰器，我们会这样定义`sealed`函数：
 
 ```ts
 function sealed(target) {
@@ -38,36 +38,36 @@ function sealed(target) {
 }
 ```
 
-> NOTE&emsp; You can see a more detailed example of a decorator in [Class Decorators](#class-decorators), below.
+> 注意&emsp; 下面[类装饰器](#class-decorators)小节里有一个更加详细的例子。
 
-## Decorator Factories
+## <a name="decorator-factories"></a>装饰器工厂
 
-If we want to customize how a decorator is applied to a declaration, we can write a decorator factory.
-A *Decorator Factory* is simply a function that returns the expression that will be called by the decorator at runtime.
+如果我们想自定义装饰器是如何作用于声明的，我们得写一个装饰器工厂函数。
+*装饰器工厂*就是一个简单的函数，它返回一个表达式，以供装饰器在运行时调用。
 
-We can write a decorator factory in the following fashion:
+我们可以通过下面的方式来写一个装饰器工厂
 
 ```ts
-function color(value: string) { // this is the decorator factory
-    return function (target) { // this is the decorator
+function color(value: string) { // 这是一个装饰器工厂
+    return function (target) { //  这是装饰器
         // do something with "target" and "value"...
     }
 }
 ```
 
-> NOTE&emsp; You can see a more detailed example of a decorator factory in [Method Decorators](#method-decorators), below.
+> 注意&emsp; 下面[方法装饰器](#method-decorators)小节里有一个更加详细的例子。
 
-## Decorator Composition
+## 装饰器组合
 
-Multiple decorators can be applied to a declaration, as in the following examples:
+多个装饰器可以同时应用到一个声明上，就像下面的示例：
 
-* On a single line:
+* 写在同一行上：
 
   ```ts
   @f @g x
   ```
 
-* On multiple lines:
+* 写在多行上：
 
   ```ts
   @f
@@ -75,14 +75,14 @@ Multiple decorators can be applied to a declaration, as in the following example
   x
   ```
 
-When multiple decorators apply to a single declaration, their evaluation is similar to [function composition in mathematics](http://en.wikipedia.org/wiki/Function_composition). In this model, when composing functions *f* and *g*, the resulting composite (*f* ∘ *g*)(*x*) is equivalent to *f*(*g*(*x*)).
+当多个装饰器应用于一个声明上，它们求值方式与[复合函数](http://en.wikipedia.org/wiki/Function_composition)相似。在这个模型下，当复合*f*和*g*时，复合的结果(*f* ∘ *g*)(*x*)等同于*f*(*g*(*x*))。
 
-As such, the following steps are performed when evaluating multiple decorators on a single declaration in TypeScript:
+同样的，在TypeScript里，当多个装饰器应用在一个声明上时会进行如下步骤的操作：
 
-1. The expressions for each decorator are evaluated top-to-bottom.
-2. The results are then called as functions from bottom-to-top.
+1. 由上至下依次对装饰器表达式求值。
+2. 求值的结果会被当作函数，由下至上依次调用。
 
-If we were to use [decorator factories](#decorator-factories), we can observe this evaluation order with the following example:
+如果我们使用[装饰器工厂](#decorator-factories)的话，可以通过下面的例子来观察它们求值的顺序：
 
 ```ts
 function f() {
@@ -106,7 +106,7 @@ class C {
 }
 ```
 
-Which would print this output to the console:
+在控制台里会打印出如下结果：
 
 ```shell
 f(): evaluated
@@ -115,29 +115,29 @@ g(): called
 f(): called
 ```
 
-## Decorator Evaluation
+## 装饰器求值
 
-There is a well defined order to how decorators applied to various declarations inside of a class are applied:
+下在是定义好的步骤用来说明装饰器是如何应用到类里面不同声明上的：
 
-1. *Parameter Decorators*, followed by *Method*, *Accessor*, or *Property Decorators* are applied for each instance member.
-2. *Parameter Decorators*, followed by *Method*, *Accessor*, or *Property Decorators* are applied for each static member.
-3. *Parameter Decorators* are applied for the constructor.
-4. *Class Decorators* are applied for the class.
+1. *参数装饰器*，然后*方法*，*访问符*，或*属性装饰器*应用到每个实例成员。
+2. *参数装饰器*，然后*方法*，*访问符*，或*属性装饰器*应用到每个静态成员。
+3. *参数装饰器*应用到构造函数。
+4. *类装饰器*应用到类。
 
-## Class Decorators
+## <a name="class-decorators"></a>类装饰器
 
-A *Class Decorator* is declared just before a class declaration.
-The class decorator is applied to the constructor of the class and can be used to observe, modify, or replace a class definition.
-A class decorator cannot be used in a declaration file, or in any other ambient context (such as on a `declare` class).
+*类装饰器*在类声明之前被声明（紧贴着类声明）。
+类装饰器应用于类构造函数，可以用来监视，修改或替换类定义。
+类装饰器不能用在声明文件中(`.d.ts`)，也不能用在任何外部上下文中（比如`declare`的类）。
 
-The expression for the class decorator will be called as a function at runtime, with the constructor of the decorated class as its only argument.
+类装饰器表达式会在运行时当作函数被调用，类的构造函数作为其唯一的参数。
 
-If the class decorator returns a value, it will replace the class declaration with the provided constructor function.
+如果类装饰器返回一个值，它会使用提供的构造函数来替换类的声明。
 
-> NOTE&nbsp; Should you chose to return a new constructor function, you must take care to maintain the original prototype.
-The logic that applies decorators at runtime will **not** do this for you.
+> 注意&nbsp; 如果你要返回一个新的构造函数，你必须注意处理好原来的原型链。
+在运行时的装饰器调用逻辑中*不会*为你做这些。
 
-The following is an example of a class decorator (`@sealed`) applied to the `Greeter` class:
+下面是使用类装饰器(`@sealed`)的例子，应用到`Greeter`类：
 
 ```ts
 @sealed
@@ -152,7 +152,7 @@ class Greeter {
 }
 ```
 
-We can define the `@sealed` decorator using the following function declaration:
+我们可以这样定义`@sealed`装饰器
 
 ```ts
 function sealed(constructor: Function) {
@@ -161,27 +161,27 @@ function sealed(constructor: Function) {
 }
 ```
 
-When `@sealed` is executed, it will seal both the constructor and its prototype.
+当`@sealed`被执行的时候，它为锁定构造函数和它的原型。
 
-## Method Decorators
+## <a name="method-decorators"></a>方法装饰器
 
-A *Method Decorator* is declared just before a method declaration.
-The decorator is applied to the *Property Descriptor* for the method, and can be used to observe, modify, or replace a method definition.
-A method decorator cannot be used in a declaration file, on an overload, or in any other ambient context (such as in a `declare` class).
+*方法装饰器*声明在一个方法的声明之前（紧贴着方法声明）。
+它会被应用到方法的*属性描述符*上，可以用来监视，修改或者替换方法定义。
+方法装饰器不能用在声明文件(`.d.ts`)，重载或者任何外部上下文（比如`declare`的类）中。
 
-The expression for the method decorator will be called as a function at runtime, with the following three arguments:
+方法装饰器表达式会在运行时当作函数被调用，传入下在3个参数：
 
-1. Either the constructor function of the class for a static member, or the prototype of the class for an instance member.
-2. The name of the member.
-3. The *Property Descriptor* for the member.
+1. 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象。
+2. 成员的名字。
+3. 成员的*属性描述符*。
 
-> NOTE&emsp; The *Property Descriptor* will be `undefined` if your script target is less than `ES5`.
+> 注意&emsp; 如果代码输出目标版本小于`ES5`，*Property Descriptor*将会是`undefined`。
 
-If the method decorator returns a value, it will be used as the *Property Descriptor* for the method.
+如果方法装饰器返回一个值，它会被用作方法的*属性描述符*。
 
-> NOTE&emsp; The return value is ignored if your script target is less than `ES5`.
+> 注意&emsp; 如果代码输出目标版本小于`ES5`返回值会被忽略。
 
-The following is an example of a method decorator (`@enumerable`) applied to a method on the `Greeter` class:
+下面是一个方法装饰器（`@enumerable`）的例子，应用于`Greeter`类的方法上：
 
 ```ts
 class Greeter {
@@ -197,7 +197,7 @@ class Greeter {
 }
 ```
 
-We can define the `@enumerable` decorator using the following function declaration:
+我们可以用下面的函数声明来定义`@enumerable`装饰器：
 
 ```ts
 function enumerable(value: boolean) {
@@ -207,32 +207,32 @@ function enumerable(value: boolean) {
 }
 ```
 
-The `@enumerable(false)` decorator here is a [decorator factory](#decorator-factories).
-When the `@enumerable(false)` decorator is called, it modifies the `enumerable` property of the property descriptor.
+这里的`@enumerable(false)`是一个[装饰器工厂](#decorator-factories)。
+当装饰器`@enumerable(false)`被调用时，它会修改属性描述符的`enumerable`属性。
 
-## Accessor Decorators
+## <a name="accessor-decorators"></a>访问符装饰器
 
-An *Accessor Decorator* is declared just before an accessor declaration.
-The accessor decorator is applied to the *Property Descriptor* for the accessor and can be used to observe, modify, or replace an accessor's definitions.
-An accessor decorator cannot be used in a declaration file, or in any other ambient context (such as in a `declare` class).
+*访问符装饰器*声明在一个访问符的声明之前（紧贴着访问符声明）。
+访问符装饰器应用于访问符的*属性描述符*并且可以用来监视，修改或替换一个访问符的定义。
+访问符装饰器不能用在声明文件中（.d.ts），或者任何外部上下文（比如`declare`的类）里。
 
-> NOTE&emsp; TypeScript disallows decorating both the `get` and `set` accessor for a single member.
-Instead, all decorators for the member must be applied to the first accessor specified in document order.
-This is because decorators apply to a *Property Descriptor*, which combines both the `get` and `set` accessor, not each declaration separately.
+> 注意&emsp; TypeScript不允许同时装饰一个成员的`get`和`set`访问符。
+而且，一个成员的所有装饰器会以出现在顺序被应用在第一个访问符上。
+因为装饰器应用于一个*属性描述符*，它联合了`get`和`set`访问符，而不是分开声明的。
 
-The expression for the accessor decorator will be called as a function at runtime, with the following three arguments:
+访问符装饰器表达式会在运行时当作函数被调用，传入下在3个参数：
 
-1. Either the constructor function of the class for a static member, or the prototype of the class for an instance member.
-2. The name of the member.
-3. The *Property Descriptor* for the member.
+1. 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象。
+2. 成员的名字。
+3. 成员的*属性描述符*。
 
-> NOTE&emsp; The *Property Descriptor* will be `undefined` if your script target is less than `ES5`.
+> 注意&emsp; 如果代码输出目标版本小于`ES5`，*Property Descriptor*将会是`undefined`。
 
-If the accessor decorator returns a value, it will be used as the *Property Descriptor* for the member.
+如果访问符装饰器返回一个值，它会被用作方法的*属性描述符*。
 
-> NOTE&emsp; The return value is ignored if your script target is less than `ES5`.
+> 注意&emsp; 如果代码输出目标版本小于`ES5`返回值会被忽略。
 
-The following is an example of an accessor decorator (`@configurable`) applied to a member of the `Point` class:
+下面是使用了访问符装饰器（`@configurable`）的例子，应用于`Point`类的成员上：
 
 ```ts
 class Point {
@@ -251,7 +251,7 @@ class Point {
 }
 ```
 
-We can define the `@configurable` decorator using the following function declaration:
+我们可以通过如下函数声明来定义`@configurable`装饰器：
 
 ```ts
 function configurable(value: boolean) {
@@ -261,25 +261,27 @@ function configurable(value: boolean) {
 }
 ```
 
-## Property Decorators
+## <a name="property-decorators"></a>属性装饰器
 
-A *Property Decorator* is declared just before a property declaration.
-A property decorator cannot be used in a declaration file, or in any other ambient context (such as in a `declare` class).
+*属性装饰器*声明在一个属性声明之前（紧贴着属性声明）。
+属性装饰器不能用在声明文件中（.d.ts），或者任何外部上下文（比如`declare`的类）里。
 
-The expression for the property decorator will be called as a function at runtime, with the following two arguments:
+属性装饰器表达式会在运行时当作函数被调用，传入下在2个参数：
 
-1. Either the constructor function of the class for a static member, or the prototype of the class for an instance member.
-2. The name of the member.
+1. 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象。
+2. 成员的名字。
 
-> NOTE&emsp; A *Property Descriptor* is not provided as an argument to a property decorator due to how property decorators are initialized in TypeScript.
-This is because there is currently no mechanism to describe an instance property when defining members of a prototype, and no way to observe or modify the initializer for a property.
-As such, a property decorator can only be used to observe that a property of a specific name has been declared for a class.
+> 注意&emsp; *属性描述符*不会做为参数传入属性装饰器，这与TypeScript是如何初始化属性装饰器的有关。
+因为目前没有办法在定义一个原型对象的成员时描述一个实例属性，并且没办法监视或修改一个属性的初始化方法。
+因此，属性描述符只能用来监视类中是否声明了某个名字的属性。
 
-If the property decorator returns a value, it will be used as the *Property Descriptor* for the member.
+如果属性装饰器返回一个值，它会被用作方法的*属性描述符*。
 
-> NOTE&emsp; The return value is ignored if your script target is less than `ES5`.
+> 注意&emsp; 如果代码输出目标版本小于`ES5`，返回值会被忽略。
 
-We can use this information to record metadata about the property, as in the following example:
+如果访问符装饰器返回一个值，它会被用作方法的*属性描述符*。
+
+我们可以用它来记录这个属性的元数据，如下例所示：
 
 ```ts
 class Greeter {
@@ -296,7 +298,7 @@ class Greeter {
 }
 ```
 
-We can then define the `@format` decorator and `getFormat` functions using the following function declarations:
+然后定义`@format`装饰器和`getFormat`函数：
 
 ```ts
 import "reflect-metadata";
@@ -312,30 +314,30 @@ function getFormat(target: any, propertyKey: string) {
 }
 ```
 
-The `@format("Hello, %s")` decorator here is a [decorator factory](#decorator-factories).
-When `@format("Hello, %s")` is called, it adds a metadata entry for the property using the `Reflect.metadata` function from the `reflect-metadata` library.
-When `getFormat` is called, it reads the metadata value for the format.
+这个 `@format("Hello, %s")` 装饰器是个 [装饰器工厂](#decorator-factories)。
+当`@format("Hello, %s")`被调用时，它添加一条这个属性的元数据，通过`reflect-metadata`库里的`Reflect.metadata`函数。
+当`getFormat`被调用时，它读取格式的元数据。
 
-> NOTE&emsp; This example requires the `reflect-metadata` library.
-See [Metadata](#metadata) for more information about the `reflect-metadata` library.
+> 注意&emsp; 这个例子需要使用`reflect-metadata`库。
+查看[元数据](#metadata)了解`reflect-metadata`库更详细的信息。
 
-## Parameter Decorators
+## <a name="parameter-decorators"></a>参数装饰器
 
-A *Parameter Decorator* is declared just before a parameter declaration.
-The parameter decorator is applied to the function for a class constructor or method declaration.
-A parameter decorator cannot be used in a declaration file, an overload, or in any other ambient context (such as in a `declare` class).
+*参数装饰器*声明在一个参数声明之前（紧贴着参数声明）。
+参数装饰器应用于类构造函数或方法声明。
+参数装饰器不能用在声明文件（.d.ts），重载或其它外部上下文（比如`declare`的类）里。
 
-The expression for the parameter decorator will be called as a function at runtime, with the following three arguments:
+参数装饰器表达式会在运行时当作函数被调用，传入下在3个参数：
 
-1. Either the constructor function of the class for a static member, or the prototype of the class for an instance member.
-2. The name of the member.
-3. The ordinal index of the parameter in the function's parameter list.
+1. 对于静态成员来说是类的构造函数，对于实例成员是类的原型对象。
+2. 成员的名字。
+3. 参数在函数参数列表中的索引。
 
-> NOTE&emsp; A parameter decorator can only be used to observe that a parameter has been declared on a method.
+> 注意&emsp; 参数装饰器只能用来监视一个方法的参数是否被传入。
 
-The return value of the parameter decorator is ignored.
+参数装饰器的返回值会被忽略。
 
-The following is an example of a parameter decorator (`@required`) applied to parameter of a member of the `Greeter` class:
+下例定义了参数装饰器（`@required`）并应用于`Greeter`类方法的一个参数：
 
 ```ts
 class Greeter {
@@ -352,7 +354,7 @@ class Greeter {
 }
 ```
 
-We can then define the `@required` and `@validate` decorators using the following function declarations:
+然后我们使用下面的函数定义 `@required` 和 `@validate` 装饰器：
 
 ```ts
 import "reflect-metadata";
@@ -379,26 +381,26 @@ function validate(target: any, propertyName: string, descriptor: TypedPropertyDe
 }
 ```
 
-The `@required` decorator adds a metadata entry that marks the parameter as required.
-The `@validate` decorator then wraps the existing `greet` method in a function that validates the arguments before invoking the original method.
+`@required`装饰器添加了元数据实体把参数标记为必须的。
+`@validate`装饰器把`greet`方法包裹在一个函数里在调用原先的函数前验证函数参数。
 
-> NOTE&emsp; This example requires the `reflect-metadata` library.
-See [Metadata](#metadata) for more information about the `reflect-metadata` library.
+> 注意&emsp; 这个例子使用了`reflect-metadata`库。
+查看[元数据](#metadata)了解`reflect-metadata`库的更多信息。
 
-## Metadata
+## 元数据
 
-Some examples use the `reflect-metadata` library which adds a polyfill for an [experimental metadata API](https://github.com/rbuckton/ReflectDecorators).
-This library is not yet part of the ECMAScript (JavaScript) standard.
-However, once decorators are officially adopted as part of the ECMAScript standard these extensions will be proposed for adoption.
+一些例子使用了`reflect-metadata`库来支持[实验性的 metadata API](https://github.com/rbuckton/ReflectDecorators)。
+这个库还不是ECMAScript (JavaScript)标准的一部分。
+然而，当装饰器被ECMAScript官方标准采纳后，这些扩展也将被推荐给ECMAScript以采纳。
 
-You can install this library via npm:
+你可以通过npm安装这个库：
 
 ```shell
 npm i reflect-metadata --save
 ```
 
-TypeScript includes experimental support for emitting certain types of metadata for declarations that have decorators.
-To enable this experimental support, you must set the `emitDecoratorMetadata` compiler option either on the command line or in your `tsconfig.json`:
+TypeScript支持为带有装饰器的声明生成元数据。
+你需要在命令行或`tsconfig.json`里启用`emitDecoratorMetadata`编译器选项。
 
 **Command Line**:
 
@@ -418,9 +420,9 @@ tsc --target ES5 --experimentalDecorators --emitDecoratorMetadata
 }
 ```
 
-When enabled, as long as the `reflect-metadata` library has been imported, additional design-time type information will be exposed at runtime.
+当启用后，只要`reflect-metadata`库被引入了，设计阶段额外的信息可以在运行时使用。
 
-We can see this in action in the following example:
+如下例所示：
 
 ```ts
 import "reflect-metadata";
@@ -454,8 +456,8 @@ function validate<T>(target: any, propertyKey: string, descriptor: TypedProperty
 }
 ```
 
-The TypeScript compiler will inject design-time type information using the `@Reflect.metadata` decorator.
-You could consider it the equivalent of the following TypeScript:
+TypeScript编译器可以通过`@Reflect.metadata`装饰器注入设计阶段的类型信息。
+你可以认为它相当于下面的TypeScript：
 
 ```ts
 class Line {
@@ -475,4 +477,7 @@ class Line {
 
 ```
 
-> NOTE&emsp; Decorator metadata is an experimental feature and may introduce breaking changes in future releases.
+> 注意&emsp; 装饰器元数据是个实验性的特性并且可能在以后的版本中发生破坏性的改变（breaking changes）。
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

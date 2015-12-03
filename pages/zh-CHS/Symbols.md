@@ -1,25 +1,25 @@
-# Introduction
+# 介绍
 
-Starting with ECMAScript 2015, `symbol` is a primitive data type, just like `number` and `string`.
+至ECMAScript 2015开始，`symbol`成为了一种新的原始类型，就像`number`和`string`一样。
 
-`symbol` values are created by calling the `Symbol` constructor.
+`symbol`类型的值是通过`Symbol`构造函数创建的。
 
 ```ts
 var sym1 = Symbol();
 
-var sym2 = Symbol("key"); // optional string key
+var sym2 = Symbol("key"); // 可选的字符串key
 ```
 
-Symbols are immutable, and unique.
+Symbols是不可改变的且唯一。
 
 ```ts
 var sym2 = Symbol("key");
 var sym3 = Symbol("key");
 
-sym2 === sym3; // false, symbols are unique
+sym2 === sym3; // false, symbols是唯一的
 ```
 
-Just like strings, symbols can be used as keys for object properties.
+像字符串一样，symbols也可以被用做对象属性的键。
 
 ```ts
 let sym = Symbol();
@@ -30,7 +30,7 @@ obj[sym] = "value";
 console.log(obj[sym]); // "value"
 ```
 
-Symbols can also be combined with computed property declarations to declare object properties and class members.
+Symbols也可以与计算出的属性名声明相结合来声明对象的属性和类成员。
 
 ```ts
 const getClassNameSymbol = Symbol();
@@ -45,56 +45,59 @@ let c = new C();
 let className = c[getClassNameSymbol](); // "C"
 ```
 
-# Well-known Symbols
+# 大家熟悉的Symbols
 
-In addition to user-defined symbols, there are well-known built-in symbols.
-Built-in symbols are used to represent internal language behaviors.
+除了用户定义的symbols，还有一些已经熟悉的内置symbols。
+内置symbols用来表示语言内部的行为。
 
-Here is a list of well-known symbols:
+下面是这样一些symbols的示例：
 
 ## `Symbol.hasInstance`
 
-A method that determines if a constructor object recognizes an object as one of the constructor’s instances. Called by the semantics of the instanceof operator.
+这个方法是构造器对象用来识别一个对象是否是其实例。会被`instanceof`运算符调用。
 
 ## `Symbol.isConcatSpreadable`
 
-A Boolean value indicating that an object should be flatten to its array elements by Array.prototype.concat.
+布尔值，表示当在一个对象上调用`Array.prototype.concat`时，这个对象的数组元素是否可展开。
 
 ## `Symbol.iterator`
 
-A method that returns the default iterator for an object. Called by the semantics of the for-of statement.
+一个方法返回对象的默认迭代器。被`for-of`语句调用。
 
 ## `Symbol.match`
 
-A regular expression method that matches the regular expression against a string. Called by the `String.prototype.match` method.
+正则表达式方法用来匹配字符串。被`String.prototype.match`调用。
 
 ## `Symbol.replace`
 
-A regular expression method that replaces matched substrings of a string. Called by the `String.prototype.replace` method.
+正则表达式方法用来替换字符串中匹配的子串。被`String.prototype.replace`调用。
 
 ## `Symbol.search`
 
-A regular expression method that returns the index within a string that matches the regular expression. Called by the `String.prototype.search` method.
+正则表达式方法返回匹配上的部分在字符串中的索引。被`String.prototype.search`调用。
 
 ## `Symbol.species`
 
-A function valued property that is the constructor function that is used to create derived objects.
+值为一个构造函数，用来创建对象实例。
 
 ## `Symbol.split`
 
-A regular expression method that splits a string at the indices that match the regular expression.
-Called by the `String.prototype.split` method.
+正则表达式方法来用分割字符串。
+被`String.prototype.split`调用。
 
 ## `Symbol.toPrimitive`
 
-A method that converts an object to a corresponding primitive value.
-Called by the `ToPrimitive` abstract operation.
+把对象转换为相应的原始值。
+被`ToPrimitive`抽象操作调用。
 
 ## `Symbol.toStringTag`
 
-A String value that is used in the creation of the default string description of an object.
-Called by the built-in method `Object.prototype.toString`.
+字符串用来创建对象默认的字符串描述。
+被内置方法`Object.prototype.toString`调用。
 
 ## `Symbol.unscopables`
 
-An Object whose own property names are property names that are excluded from the 'with' environment bindings of the associated objects.
+一个对象，它自己拥有的属性会被`with`作用域排除在外。
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

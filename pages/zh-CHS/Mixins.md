@@ -1,12 +1,12 @@
-# Introduction
+# 介绍
 
-Along with traditional OO hierarchies, another popular way of building up classes from reusable components is to build them by combining simpler partial classes.
-You may be familiar with the idea of mixins or traits for languages like Scala, and the pattern has also reached some popularity in the JavaScript community.
+除了传统的面向对象继承方式，还流行一种通过可重用组件创建类的方式，就是联合另一个简单类的代码。
+你可能在Scala等语言里对mixins及其特性已经很熟悉了，但它在JavaScript中也是很流行的。
 
-# Mixin sample
+# 混入示例
 
-In the code below, we show how you can model mixins in TypeScript.
-After the code, we'll break down how it works.
+下面的代码演示了如何在TypeScript里使用混入。
+后面我们还会解释这段代码是怎么工作的。
 
 ```ts
 // Disposable Mixin
@@ -46,7 +46,7 @@ class SmartObject implements Disposable, Activatable {
     activate: () => void;
     deactivate: () => void;
 }
-applyMixins(SmartObject, [Disposable, Activatable]);
+applyMixins(SmartObject, [Disposable, Activatable])
 
 var smartObj = new SmartObject();
 setTimeout(() => smartObj.interact(), 1000);
@@ -59,16 +59,16 @@ function applyMixins(derivedCtor: any, baseCtors: any[]) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
             derivedCtor.prototype[name] = baseCtor.prototype[name];
-        });
+        })
     });
 }
 ```
 
-# Understanding the sample
+# 理解这个例子
 
-The code sample starts with the two classes that will act as our mixins.
-You can see each one is focused on a particular activity or capability.
-We'll later mix these together to form a new class from both capabilities.
+代码里首先定义了两个类，它们将做为mixins。
+可以看到每个类都只定义了一个特定的行为或功能。
+稍后我们使用它们来创建一个新类，同时具有这两种功能。
 
 ```ts
 // Disposable Mixin
@@ -92,21 +92,21 @@ class Activatable {
 }
 ```
 
-Next, we'll create the class that will handle the combination of the two mixins.
-Let's look at this in more detail to see how it does this:
+下面创建一个类，结合了这两个mixins。
+下面来看一下具体是怎么操作的：
 
 ```ts
 class SmartObject implements Disposable, Activatable {
 ```
 
-The first thing you may notice in the above is that instead of using `extends`, we use `implements`.
-This treats the classes as interfaces, and only uses the types behind Disposable and Activatable rather than the implementation.
-This means that we'll have to provide the implementation in class.
-Except, that's exactly what we want to avoid by using mixins.
+首先应该注意到的是，没使用`extends`而是使用`implements`。
+把类当成了接口，仅使用Disposable和Activatable的类型而非其实现。
+这意味着我们需要在类里面实现接口。
+但是这是我们在用mixin时想避免的。
 
-To satisfy this requirement, we create stand-in properties and their types for the members that will come from our mixins.
-This satisfies the compiler that these members will be available at runtime.
-This lets us still get the benefit of the mixins, albeit with some bookkeeping overhead.
+我们可以这么做来达到目的，为将要mixin进来的属性方法创建出占位属性。
+这告诉编译器这些成员在运行时是可用的。
+这样就能使用mixin带来的便利，虽说需要提前定义一些占位属性。
 
 ```ts
 // Disposable
@@ -118,22 +118,25 @@ activate: () => void;
 deactivate: () => void;
 ```
 
-Finally, we mix our mixins into the class, creating the full implementation.
+最后，把mixins混入定义的类，完成全部实现部分。
 
 ```ts
-applyMixins(SmartObject, [Disposable, Activatable]);
+applyMixins(SmartObject, [Disposable, Activatable])
 ```
 
-Lastly, we create a helper function that will do the mixing for us.
-This will run through the properties of each of the mixins and copy them over to the target of the mixins, filling out the stand-in properties with their implementations.
+最后，创建这个帮助函数，帮我们做混入操作。
+它会遍历mixins上的所有属性，并复制到目标上去，把之前的占位属性替换成真正的实现代码。
 
 ```ts
 function applyMixins(derivedCtor: any, baseCtors: any[]) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
             derivedCtor.prototype[name] = baseCtor.prototype[name];
-        });
+        })
     });
 }
 
 ```
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

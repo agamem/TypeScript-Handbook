@@ -1,39 +1,39 @@
-# Introduction
+# 介绍
 
-Some of the unique concepts in TypeScript come from the need to describe what is happening to the shape of JavaScript objects at the type level.
-One example that is especially unique to TypeScript is the concept of 'declaration merging'.
-Understanding this concept will give you an advantage when working with existing JavaScript in your TypeScript.
-It also opens the door to more advanced abstraction concepts.
+TypeScript有一些独特的概念，有的是因为我们需要描述JavaScript顶级对象的类型发生了哪些变化。
+这其中之一叫做`声明合并`。
+理解了这个概念，对于你使用TypeScript去操作现有的JavaScript来说是大有帮助的。
+同时，也会有助于理解更多高级抽象的概念。
 
-First, before we get into how declarations merge, let's first describe what we mean by 'declaration merging'.
+首先，在了解如何进行声明合并之前，让我们先看一下什么叫做`声明合并`。
 
-For the purposes of this article, declaration merging specifically means that the compiler is doing the work of merging two separate declarations declared with the same name into a single definition.
-This merged definition has the features of both of the original declarations.
-Declaration merging is not limited to just two declarations, as any number of declarations can be merged.
+在这个手册里，声明合并是指编译器会把两个相同名字的声明合并成一个单独的声明。
+合并后的声明同时具有那两个被合并的声明的特性。
+声明合并不限于只合并两个，任意数量都可以。
 
-# Basic Concepts
+# 基础概念
 
-In TypeScript, a declaration creates entities in at least one of three groups: namespace, type, or value.
-Namespace-creating declarations create a namespace, which contains names that are accessed using a dotted notation.
-Type-creating declarations do just that: they create a type that is visible with the declared shape and bound to the given name.
-Lastly, value-creating declarations create values that are visible in the output JavaScript.
+Typescript中的声明会创建以下三种实体之一：命名空间，类型或者值。
+用于创建命名空间的声明会新建一个命名空间：它包含了可以用（.）符号访问的一些名字。
+用于创建类型的声明所做的是：用给定的名字和结构创建一种类型。
+最后，创建值的声明就是那些可以在生成的JavaScript里看到的那部分（比如：函数和变量）。
 
 | Declaration Type | Namespace | Type | Value |
 |------------------|:---------:|:----:|:-----:|
 | Namespace        |     X     |      |   X   |
 | Class            |           |   X  |   X   |
-| Enum             |           |   X  |   X   |
 | Interface        |           |   X  |       |
-| Type Alias       |           |   X  |       |
 | Function         |           |      |   X   |
 | Variable         |           |      |   X   |
 
-Understanding what is created with each declaration will help you understand what is merged when you perform a declaration merge.
+理解每个声明创建了什么，有助于理解当声明合并时什么东西被合并了。
 
-# Merging Interfaces
+理解了每种声明会对应创建什么对于理解如果进行声明合并是有帮助的。
 
-The simplest, and perhaps most common, type of declaration merging is interface merging.
-At the most basic level, the merge mechanically joins the members of both declarations into a single interface with the same name.
+# 合并接口
+
+最简单最常见的就是合并接口，声明合并的种类是：接口合并。
+从根本上说，合并的机制是把各自声明里的成员放进一个同名的单一接口里。
 
 ```ts
 interface Box {
@@ -48,13 +48,13 @@ interface Box {
 var box: Box = {height: 5, width: 6, scale: 10};
 ```
 
-Non-function members of the interfaces must be unique.
-The compiler will issue an error if the interfaces both declare a non-function member of the same name.
+接口中非函数的成员必须是唯一的。如果多个接口中具有相同名字的非函数成员就会报错。
 
-For function members, each function member of the same name is treated as describing an overload of the same function.
-Of note, too, is that in the case of interface `A` merging with later interface `A` (here called `A'`), the overload set of `A'` will have a higher precedence than that of interface `A`.
+对于函数成员，每个同名函数声明都会被当成这个函数的一个重载。
 
-That is, in the example:
+需要注意的是，接口A与它后面的接口A（把这个接口叫做A'）合并时，A'中的重载函数具有更高的优先级。
+
+如下例所示：
 
 ```ts
 interface Document {
@@ -70,8 +70,8 @@ interface Document {
 }
 ```
 
-The two interfaces will merge to create a single declaration.
-Notice that the elements of each group maintains the same order, just the groups themselves are merged with later overload sets coming first:
+这三个接口合并成一个声明。
+注意每组接口里的声明顺序保持不变，只是靠后的接口会出现在它前面的接口声明之前。
 
 ```ts
 interface Document {
@@ -84,16 +84,16 @@ interface Document {
 ```
 
 
-# Merging Namespaces
+# 合并命名空间
 
-Similarly to interfaces, namespaces of the same name will also merge their members.
-Since namespaces create both a namespace and a value, we need to understand how both merge.
+与接口相似，同名的命名空间也会合并其成员。
+命名空间会创建出命名空间和值，我们需要知道这两者都是怎么合并的。
 
-To merge the namespaces, type definitions from exported interfaces declared in each namespace are themselves merged, forming a single namespace with merged interface definitions inside.
+命名空间的合并，模块导出的同名接口进行合并，构成单一命名空间内含合并后的接口。
 
-To merge the value, at each declaration site, if a namespace already exists with the given name, it is further extended by taking the existing namespace and adding the exported members of the second namespace to the first.
+值的合并，如果当前已经存在给定名字的命名空间，那么后来的命名空间的导出成员会被加到已经存在的那个模块里。
 
-The declaration merge of `Animals` in this example:
+`Animals`声明合并示例：
 
 ```ts
 namespace Animals {
@@ -106,7 +106,7 @@ namespace Animals {
 }
 ```
 
-is equivalent to:
+等同于：
 
 ```ts
 namespace Animals {
@@ -117,10 +117,10 @@ namespace Animals {
 }
 ```
 
-This model of namespace merging is a helpful starting place, but to get a more complete picture we need to also understand what happens with non-exported members.
-Non-exported members are only visible in the original (un-merged) namespace. This means that after merging, merged members that came from other declarations can not see non-exported members.
+除了这些合并外，你还需要了解非导出成员是如何处理的。
+非导出成员仅在其原始存在于的命名空间（未合并的）之内可见。这就是说合并之后，从其它命名空间合并进来的成员无法访问非导出成员了。
 
-We can see this more clearly in this example:
+下例提供了更清晰的说明：
 
 ```ts
 namespace Animal {
@@ -138,17 +138,17 @@ namespace Animal {
 }
 ```
 
-Because `haveMuscles` is not exported, only the `animalsHaveMuscles` function that shares the same un-merged namespace can see the symbol.
-The `doAnimalsHaveMuscles` function, even though it's part of the merged `Animal` namespace can not see this un-exported member.
+因为`haveMuscles`并没有导出，只有`animalsHaveMuscles`函数共享了原始未合并的命名空间可以访问这个变量。
+`doAnimalsHaveMuscles`函数虽是合并命名空间的一部分，但是访问不了未导出的成员。
 
-# Merging Namespaces with Classes, Functions, and Enums
+# 命名空间与类和函数和枚举类型合并
 
-Namespaces are flexible enough to also merge with other types of declarations.
-To do so, the namespace declaration must follow the declaration it will merge with. The resulting declaration has properties of both declaration types.
-TypeScript uses this capability to model some of patterns in JavaScript as well as other programming languages.
+命名空间可以与其它类型的声明进行合并。
+只要命名空间的定义符合将要合并类型的定义。合并结果包含两者的声明类型。
+Typescript使用这个功能去实现一些JavaScript里的设计模式。
 
-The first namespace merge we'll cover is merging a namespace with a class.
-This gives the user a way of describing inner classes.
+首先，尝试将命名空间和类合并。
+这让我们可以定义内部类。
 
 ```ts
 class Album {
@@ -159,12 +159,12 @@ namespace Album {
 }
 ```
 
-The visibility rules for merged members is the same as described in the 'Merging Namespaces' section, so we must export the `AlbumLabel` class for the merged class to see it.
-The end result is a class managed inside of another class.
-You can also use namespaces to add more static members to an existing class.
+合并规则与上面`合并命名空间`小节里讲的规则一致，我们必须导出`AlbumLabel`类，好让合并的类能访问。
+合并结果是一个类并带有一个内部类。
+你也可以使用命名空间为类增加一些静态属性。
 
-In addition to the pattern of inner classes, you may also be familiar with JavaScript practice of creating a function and then extending the function further by adding properties onto the function.
-TypeScript uses declaration merging to build up definitions like this in a type-safe way.
+除了内部类的模式，你在JavaScript里，创建一个函数稍后扩展它增加一些属性也是很常见的。
+Typescript使用声明合并来达到这个目的并保证类型安全。
 
 ```ts
 function buildLabel(name: string): string {
@@ -179,7 +179,7 @@ namespace buildLabel {
 alert(buildLabel("Sam Smith"));
 ```
 
-Similarly, namespaces can be used to extend enums with static members:
+相似的，命名空间可以用来扩展枚举型：
 
 ```ts
 enum Color {
@@ -206,8 +206,12 @@ namespace Color {
 }
 ```
 
-# Disallowed Merges
+# 非法的合并
 
-Not all merges are allowed in TypeScript.
-Currently, classes can not merge with other classes, variables and classes can not merge, nor can interfaces and classes.
-For information on mimicking classes merging, see the [Mixins in TypeScript] section.
+并不是所有的合并都被允许。
+现在，类不能与类合并，变量与类型不能合并，接口与类不能合并。
+想要模仿类的合并，请参考[Mixins in TypeScript](./Mixins.md)。
+
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

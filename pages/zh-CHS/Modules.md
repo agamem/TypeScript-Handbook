@@ -1,28 +1,28 @@
-> **A note about terminology:**
-It's important to note that in TypeScript 1.5, the nomenclature has changed.
-"Internal modules" are now "namespaces".
-"External modules" are now simply "modules", as to align with [ECMAScript 2015](http://www.ecma-international.org/ecma-262/6.0/)'s terminology, (namely that `module X {` is equivalent to the now-preferred `namespace X {`).
+> **关于术语的一点说明:**
+请务必注意一点，TypeScript 1.5里术语名已经发生了变化。
+“内部模块”现在称做“命名空间”。
+“外部模块”现在则简称为“模块”，这是为了与[ECMAScript 2015](http://www.ecma-international.org/ecma-262/6.0/)里的术语保持一致，(也就是说 `module X {` 相当于现在推荐的写法 `namespace X {`)。
 
-# Introduction
+# 介绍
 
-Starting with the ECMAScript 2015, JavaScript has a concept of modules. TypeScript shares this concept.
+从ECMAScript 2015开始，JavaScript引入了模块的概念。TypeScript也沿用这个概念。
 
-Modules are executed within their own scope, not in the global scope; this means that variables, functions, classes, etc. declared in a module are not visible outside the module unless they are explicitly exported using one of the [`export` forms](#export).
-Conversely, to consume a variable, function, class, interface, etc. exported from a different module, it has to be imported using one of the [`import` forms](#import).
+模块在其自身的作用域里执行，而不是在全局作用域里；这意味着定义在一个模块里的变量，函数，类等等在模块外部是不可见的，除非你明确地使用[`export`形式](#export)之一导出它们。
+相反，如果想使用其它模块导出的变量，函数，类，接口等的时候，你必须要导入它们，可以使用[`import`形式](#import)之一。
 
-Modules are declarative; the relationships between modules are specified in terms of imports and exports at the file level.
+模块是自声明的；两个模块之间的关系是通过在文件级别上使用imports和exports建立的。
 
-Modules import one another using a module loader.
-At runtime the module loader is responsible for locating and executing all dependencies of a module before executing it.
-Well-known modules loaders used in JavaScript are the [CommonJS](https://en.wikipedia.org/wiki/CommonJS) module loader for Node.js and [require.js](http://requirejs.org/) for Web applications.
+模块使用模块加载器去导入其它的模块。
+在运行时，模块加载器的作用是在执行此模块代码前去查找并执行这个模块的所有依赖。
+大家最熟知的JavaScript模块加载器是服务于Node.js的[CommonJS](https://en.wikipedia.org/wiki/CommonJS)和服务于Web应用的[Require.js](http://requirejs.org/)。
 
-In TypeScript, just as in ECMAScript 2015, any file containing a top-level `import` or `export` is considered a module.
+TypeScript与ECMAScript 2015一样，任何包含顶级`import`或者`export`的文件都被当成一个模块。
 
-# Export
+# <a name="export"></a>导出
 
-## Exporting a declaration
+## 导出声明
 
-Any declaration (such as a variable, function, class, type alias, or interface) can be exported by adding the `export` keyword.
+任何声明（比如变量，函数，类，类型别名或接口）都能够通过添加`export`关键字来导出。
 
 ##### Validation.ts
 
@@ -44,9 +44,9 @@ export class ZipCodeValidator implements StringValidator {
 }
 ```
 
-## Export statements
+## 导出语句
 
-Export statements are handy when exports need to be renamed for consumers, so the above example can be written as:
+导出语句很便利，因为我们可能需要对导出的部分重命名，所以上面的例子可以这样改写：
 
 ```ts
 class ZipCodeValidator implements StringValidator {
@@ -58,10 +58,10 @@ export { ZipCodeValidator };
 export { ZipCodeValidator as mainValidator };
 ```
 
-## Re-exports
+## 重新导出
 
-Often modules extend other modules, and partially expose some of their features.
-A re-export does not import it locally, or introduce a local variable.
+我们经常会去扩展其它模块，并且只导出那个模块的部分内容。
+重新导出功能并不会在当前模块导入那个模块或定义一个新的局部变量。
 
 ##### ParseIntBasedZipCodeValidator.ts
 
@@ -72,11 +72,11 @@ export class ParseIntBasedZipCodeValidator {
     }
 }
 
-// Export original validator but rename it
+// 导出原先的验证器但做了重命名
 export {ZipCodeValidator as RegExpBasedZipCodeValidator} from "./ZipCodeValidator";
 ```
 
-Optionally, a module can wrap one or more modules and combine all their exports using `export * from "module"` syntax.
+或者一个模块可以包裹多个模块，并把他们导出的内容联合在一起通过语法：`export * from "module"`。
 
 ##### AllValidators.ts
 
@@ -86,12 +86,12 @@ export * from "./LettersOnlyValidator"; // exports class LettersOnlyValidator
 export * from "./ZipCodeValidator";  // exports class ZipCodeValidator
 ```
 
-# Import
+# <a name="import"></a>导入
 
-Importing is just about as easy as exporting from an module.
-Importing an exported declaration is done through using one of the `import` forms below:
+模块的导入操作与导出一样简单。
+可以使用以下`import`形式之一来导入其它模块中的导出内容。
 
-## Import a single export from a module
+## 导入一个模块中的某个导出内容
 
 ```ts
 import { ZipCodeValidator } from "./ZipCodeValidator";
@@ -99,38 +99,38 @@ import { ZipCodeValidator } from "./ZipCodeValidator";
 var myValidator = new ZipCodeValidator();
 ```
 
-imports can also be renamed
+可以对导入内容重命名
 
 ```ts
 import { ZipCodeValidator as ZCV } from "./ZipCodeValidator";
 var myValidator = new ZCV();
 ```
 
-## Import the entire module into a single variable, and use it to access the module exports
+## 将整个模块导入到一个变量，并通过它来访问模块的导出部分
 
 ```ts
 import * as validator from "./ZipCodeValidator";
 var myValidator = new validator.ZipCodeValidator();
 ```
 
-## Import a module for side-effects only
+## 具有副作用的导入模块
 
-Though not recommended practice, some modules set up some global state that can be used by other modules.
-These modules may not have any exports, or the consumer is not interested in any of their exports.
-To import these modules, use:
+尽管不推荐这么做，一些模块会设置一些全局状态供其它模块使用。
+这些模块可能没有任何的导出或用户根本就不关注它的导出。
+使用下面的方法来导入这类模块：
 
 ```ts
 import "./my-module.js";
 ```
 
-# Default exports
+# 默认导出
 
-Each module can optionally export a `default` export.
-Default exports are marked with the keyword `default`; and there can only be one `default` export per module.
-`default` exports are imported using a different import form.
+每个模块都可以有一个`default`导出。
+默认导出使用`default`关键字标记；并且一个模块只能够有一个`default`导出。
+需要使用一种特殊的导入形式来导入`default`导出。
 
-`default` exports are really handy.
-For instance, a library like JQuery might have a default export of `jQuery` or `$`, which we'd probably also import under the name `$` or `jQuery`.
+`default`导出十分便利。
+比如，像JQuery这样的类库可能有一个默认导出`jQuery`或`$`，并且我们基本上也会使用同样的名字`jQuery`或`$`导出JQuery。
 
 ##### JQuery.d.ts
 
@@ -147,8 +147,8 @@ import $ from "JQuery";
 $("button.continue").html( "Next Step..." );
 ```
 
-Classes and function declarations can be authored directly as default exports.
-Defualt export class and function declaration names are optional.
+类和函数声明可以直接被标记为默认导出。
+标记为默认导出的类和函数的名字是可以省略的。
 
 ##### ZipCodeValidator.ts
 
@@ -169,7 +169,7 @@ import validator from "./ZipCodeValidator";
 var validator = new validator();
 ```
 
-or
+或者
 
 ##### StaticZipCodeValidator.ts
 
@@ -194,7 +194,7 @@ strings.forEach(s => {
 });
 ```
 
-`default` exports can also be just values:
+`default`导出也可以是一个值
 
 ##### OneTwoThree.ts
 
@@ -210,18 +210,18 @@ import num from "./OneTwoThree";
 console.log(num); // "123"
 ```
 
-# `export =` and `import = require()`
+# `export =` 和 `import = require()`
 
-Both CommonJS and AMD generally have the concept of an `exports` object which contains all exports from a module.
+CommonJS和AMD都有一个`exports`对象的概念，它包含了一个模块的所有导出内容。
 
-They also support replacing the `exports` object with a custom single object.
-Default exports are meant to act as a replacement for this behavior; however, the two are incompatible.
-TypeScript supports `export =` to module the traditional CommonJS and AMD workflow.
+它们也支持把`exports`替换为一个自定义对象。
+默认导出就好比这样一个功能；然而，它们却并不相互兼容。
+TypeScript模块支持`export =`语法，以配合传统的CommonJS和AMD的工作流。
 
-The `export =` syntax specifies a single object that is exported from the module.
-This can be a class, interface, namespace, function, or enum.
+`export =`语法定义一个模块的导出对象。
+它可以是类，接口，命名空间，函数或枚举。
 
-When importing a module using `export =`, TypeScript-specific `import var = require("module")` must be used to import the module.
+若要导入一个使用了`export =`的模块时，必须使用TypeScript提供的特定语法`import var = require("module")`。
 
 ##### ZipCodeValidator.ts
 
@@ -253,12 +253,12 @@ strings.forEach(s => {
 ```
 
 
-# Code Generation for Modules
+# 生成模块代码
 
-Depending on the module target specified during compilation, the compiler will generate appropriate code for Node.js ([CommonJS](http://wiki.commonjs.org/wiki/CommonJS)), require.js ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD)), isomorphic ([UMD](https://github.com/umdjs/umd)), [SystemJS](https://github.com/systemjs/systemjs), or [ECMAScript 2015 native modules](http://www.ecma-international.org/ecma-262/6.0/#sec-modules) (ES6) module-loading systems.
-For more information on what the `define`, `require` and `register` calls in the generated code do, consult the documentation for each module loader.
+根据编译时指定的模块目标参数，编译器会生成相应的供Node.js ([CommonJS](http://wiki.commonjs.org/wiki/CommonJS))，Require.js ([AMD](https://github.com/amdjs/amdjs-api/wiki/AMD))，isomorphic ([UMD](https://github.com/umdjs/umd)), [SystemJS](https://github.com/systemjs/systemjs)或[ECMAScript 2015 native modules](http://www.ecma-international.org/ecma-262/6.0/#sec-modules) (ES6)模块加载系统使用的代码。
+想要了解生成代码中`define`，`require` 和 `register`的意义，请参考相应模块加载器的文档。
 
-This simple example shows how the names used during importing and exporting get translated into the module loading code.
+下面的例子说明了导入导出语句里使用的名字是怎么转换为相应的模块加载器代码的。
 
 ##### SimpleModule.ts
 
@@ -323,19 +323,19 @@ import { something } from "./mod";
 export var t = something + 1;
 ```
 
-# Simple Example
+# 简单示例
 
-Below, we've consolidated the Validator implementations used in previous examples to only export a single named export from each module.
+下面我们来整理一下前面的验证器实现，每个模块只有一个命名的导出。
 
-To compile, we must specify a module target on the command line. For Node.js, use `--module commonjs`;
-for require.js, use `--module amd`. For example:
+为了编译，我们必需要在命令行上指定一个模块目标。对于Node.js来说，使用`--module commonjs`；
+对于Require.js来说，使用``--module amd`。比如：
 
 ```Shell
 tsc --module commonjs Test.ts
 ```
 
-When compiled, each module will become a separate `.js` file.
-As with reference tags, the compiler will follow `import` statements to compile dependent files.
+编译完成后，每个模块会生成一个单独的`.js`文件。
+好比使用了reference标签，编译器会根据`import`语句编译相应的文件。
 
 
 ##### Validation.ts
@@ -397,24 +397,25 @@ strings.forEach(s => {
 });
 ```
 
-# Optional Module Loading and Other Advanced Loading Scenarios
+# 可选的模块加载和其它高级加载场景
 
-In some cases, you may want to only load a module under some conditions.
-In TypeScript, we can use the pattern shown below to implement this and other advanced loading scenarios to directly invoke the module loaders without losing type safety.
+有时候，你只想在某种条件下才加载某个模块。
+在TypeScript里，使用下面的方式来实现它和其它的高级加载场景，我们可以直接调用模块加载器并且可以保证类型完全。
 
-The compiler detects whether each module is used in the emitted JavaScript.
-If a module identifier is only ever used as part of a type annotations and never as an expression, then no `require` call is emitted for that module.
-This elision of unused references is a good performance optimization, and also allows for optional loading of those modules.
+编译器会检测是否每个模块都会在生成的JavaScript中用到。
+如果一个模块标识符只在类型注解部分使用，并且完全没有在表达式中使用时，就不会生成`require`这个模块的代码。
+省略掉没有用到的引用对性能提升是很有益的，并同时提供了选择性加载模块的能力。
 
-The core idea of the pattern is that the `import id = require("...")` statement gives us access to the types exposed by the module.
-The module loader is invoked (through `require`) dynamically, as shown in the `if` blocks below.
-This leverages the reference-elision optimization so that the module is only loaded when needed.
-For this pattern to work, it's important that the symbol defined via an `import` is only used in type positions (i.e. never in a position that would be emitted into the JavaScript).
+这种模式的核心是`import id = require("...")`语句可以让我们访问模块导出的类型。
+模块加载器会被动态调用（通过`require`），就像下面`if`代码块里那样。
+它利用了省略引用的优化，所以模块只在被需要时加载。
+为了让这个模块工作，一定要注意`import`定义的标识符只能在表示类型处使用（不能在会转换成JavaScript的地方）。
 
-To maintain type safety, we can use the `typeof` keyword.
-The `typeof` keyword, when used in a type position, produces the type of a value, in this case the type of the module.
+为了确保类型安全性，我们可以使用`typeof`关键字。
+`typeof`关键字，当在表示类型的地方使用时，会得出一个类型值，这里就表示模块的类型。
 
-##### Dynamic Module Loading in Node.js
+
+##### 示例：Node.js里的动态模块加载
 
 ```ts
 declare function require(moduleName: string): any;
@@ -428,7 +429,7 @@ if (needZipValidation) {
 }
 ```
 
-##### Sample: Dynamic Module Loading in require.js
+##### 示例：require.js里的动态模块加载
 
 ```ts
 declare function require(moduleNames: string[], onLoad: (...args: any[]) => void): void;
@@ -443,7 +444,7 @@ if (needZipValidation) {
 }
 ```
 
-##### Sample: Dynamic Module Loading in System.js
+##### 示例：System.js里的动态模块加载
 
 ```ts
 declare var System: any;
@@ -458,21 +459,22 @@ if (needZipValidation) {
 }
 ```
 
-# Working with Other JavaScript Libraries
+# 使用其它的JavaScript库
 
-To describe the shape of libraries not written in TypeScript, we need to declare the API that the library exposes.
+为了描述不是用TypeScript编写的类库的类型，我们需要声明类库导出的API。
 
-We call declarations that don't define an implementation "ambient".
-Typically, these are defined in `.d.ts` files.
-If you're familiar with C/C++, you can think of these as `.h` files.
-Let's look at a few examples.
+我们叫它声明因为它不是外部程序的具体实现。
+通常会在`.d.ts`里写这些定义。
+如果你熟悉C/C++，你可以把它们当做`.h`文件。
+让我们看一些例子。
 
-## Ambient Modules
 
-In Node.js, most tasks are accomplished by loading one or more modules.
-We could define each module in its own `.d.ts` file with top-level export declarations, but it's more convenient to write them as one larger `.d.ts` file.
-To do so, we use a construct similar to ambient namespaces, but we use the `module` keyword and the quoted name of the module which will be available to a later import.
-For example:
+## 外部模块
+
+在Node.js里大部分工作是通过加载一个或多个模块实现的。
+我们可以使用顶级的`export`声明来为每个模块都定义一个`.d.ts`文件，但最好还是写在一个大的`.d.ts`文件里。
+我们使用与构造一个外部命名空间相似的方法，但是这里使用`module`关键字并且把名字用引号括起来，方便之后`import`。
+例如：
 
 ##### node.d.ts (simplified excerpt)
 
@@ -494,7 +496,7 @@ declare module "path" {
 }
 ```
 
-Now we can `/// <reference>` `node.d.ts` and then load the modules using `import url = require("url");`.
+现在我们可以`/// <reference>` `node.d.ts`并且使用`import url = require("url");`加载模块。
 
 ```ts
 /// <reference path="node.d.ts"/>
@@ -502,26 +504,26 @@ import * as URL from "url";
 var myUrl = URL.parse("http://www.typescriptlang.org");
 ```
 
-# Guidance for structuring modules
+# 创建模块结构指导
 
-## Export as close to top-level as possible
+## 尽可能地在顶层导出
 
-Consumers of your module should have as little friction as possible when using things that you export.
-Adding too many levels of nesting tends to be cumbersome, so think carefully about how you want to structure things.
+用户应该更容易地使用你模块导出的内容。
+嵌套层次过多会变得难以处理，因此仔细考虑一下如何组织你的代码。
 
-Exporting a namespace from your module is an example of adding too many layers of nesting.
-While namespaces sometimes have their uses, they add an extra level of indirection when using modules.
-This can quickly becomes a pain point for users, and is usually unnecessary.
+从你的模块中导出一个命名空间就是一个增加嵌套的例子。
+虽然命名空间有时候有它们的用处，在使用模块的时候它们额外地增加了一层。
+这对用户来说是很不便的并且通常是多余的。
 
-Static methods on an exported class have a similar problem - the class itself adds a layer of nesting.
-Unless it increases expressivity or intent in a clearly useful way, consider simply exporting a helper function.
+导出类的静态方法也有同样的问题 - 这个类本身就增加了一层嵌套。
+除非它能方便表述或便于清晰使用，否则请考虑直接导出一个辅助方法。
 
-### If you're only exporting a single `class` or `function`, use `export default`
+### 如果仅导出单个 `class` 或 `function`，使用 `export default`
 
-Just as "exporting near the top-level" reduces friction on your module's consumers, so does introducing a default export.
-If a module's primary purpose is to house one specific export, then you should consider exporting it as a default export.
-This makes both importing and actually using the import a little easier.
-For example:
+就像“在顶层上导出”帮助减少用户使用的难度，一个默认的导出也能起到这个效果。
+如果一个模块就是为了导出特定的内容，那么你应该考虑使用一个默认导出。
+这会令模块的导入和使用变得些许简单。
+比如：
 
 #### MyClass.ts
 
@@ -546,9 +548,9 @@ var x = new t();
 console.log(f());
 ```
 
-This is optimal for consumers. They can name your type whatever they want (`t` in this case) and don't have to do any excessive dotting to find your objects.
+对用户来说这是最理想的。他们可以随意命名导入模块的类型（本例为`t`）并且不需要多余的（.）来找到相关对象。
 
-### If you're exporting multiple objects, put them all at top-level
+### 如果要导出多个对象，把它们放在顶层里导出
 
 #### MyThings.ts
 
@@ -557,9 +559,9 @@ export class SomeType { /* ... */ }
 export function someFunc() { /* ... */ }
 ```
 
-Conversly when importing:
+相反地，当导入的时候：
 
-### Explicitlly list imported names
+### 明确地列出导入的名字
 
 #### Consumer.ts
 
@@ -569,7 +571,7 @@ var x = new SomeType();
 var y = someFunc();
 ```
 
-### Use the namespace import pattern if you're importing a large number of things
+### 使用命名空间导入模式当你要导出大量内容的时候
 
 #### MyLargeModule.ts
 
@@ -587,15 +589,15 @@ import * as myLargeModule from "./MyLargeModule.ts";
 var x = new myLargeModule.Dog();
 ```
 
-## Re-export to extend
+## 使用重新导出进行扩展
 
-Often you will need to extend functionality on a module.
-A common JS pattern is to augment the original object with *extensions*, similar to how JQuery extensions work.
-As we've mentioned before, modules do not *merge* like global namespace objects would.
-The recommended solution is to *not* mutate the original object, but rather export a new entity that provides the new functionality.
+你可能经常需要去扩展一个模块的功能。
+JS里常用的一个模式是JQuery那样去扩展原对象。
+如我们之前提到的，模块不会像全局命名空间对象那样去*合并*。
+推荐的方案是*不要*去改变原来的对象，而是导出一个新的实体来提供新的功能。
 
-Consider a simple calculator implementation defined in module `Calculator.ts`.
-The module also exports a helper function to test the calculator functionality by passing a list of input strings and writing the result at the end.
+假设`Calculator.ts`模块里定义了一个简单的计算器实现。
+这个模块同样提供了一个辅助函数来测试计算器的功能，通过传入一系列输入的字符串并在最后给出结果。
 
 #### Calculator.ts
 
@@ -673,7 +675,7 @@ export function test(c: Calculator, input: string) {
 }
 ```
 
-Here is a simple test for the calculator using the exposed `test` function.
+这是使用导出的`test`函数来测试计算器。
 
 #### TestCalculator.ts
 
@@ -685,7 +687,7 @@ var c = new Calculator();
 test(c, "1+2*33/11="); // prints 9
 ```
 
-Now to extend this to add support for input with numbers in bases other than 10, let's create `ProgrammerCalculator.ts`
+现在扩展它，添加支持输入其它进制（十进制以外），让我们来创建`ProgrammerCalculator.ts`。
 
 #### ProgrammerCalculator.ts
 
@@ -716,9 +718,8 @@ export { ProgrammerCalculator as Calculator };
 export { test } from "./Calculator";
 ```
 
-The new module `ProgrammerCalculator` exports an API shape similar to that of the original `Calculator` module, but does not augment any objects in the original module.
-Here is a test for our ProgrammerCalculator class:
-
+新的`ProgrammerCalculator`模块导出的API与原先的`Calculator`模块很相似，但却没有改变原模块里的对象。
+下面是测试ProgrammerCalculator类的代码：
 
 #### TestProgrammerCalculator.ts
 
@@ -729,31 +730,34 @@ var c = new Calculator(2);
 test(c, "001+010="); // prints 3
 ```
 
-## Do not use namespaces in modules
+## 模块里不要使用命名空间
 
-When first moving to a module-based organization, a common tendency is to wrap exports in an additional layer of namespaces.
-Modules have their own scope, and only exported declarations are visible from outside the module.
-With this in mind, namespace provide very little, if any, value when working with modules.
+当初次进入基于模块的开发模式时，可能总会控制不住要将导出包裹在一个命名空间里。
+模块具有其自己的作用域，并且只有导出的声明才会在模块外部可见。
+记住这点，命名空间在使用模块时几乎没什么价值。
 
-On the organization front, namespaces are handy for grouping together logically-related objects and types in the global scope.
-For example, in C#, you're going to find all the collection types in System.Collections.
-By organizing our types into hierarchical namespaces, we provide a good "discovery" experience for users of those types.
-Modules, on the other hand, are already present in a file system, necessarily.
-We have to resolve them by path and filename, so there's a logical organization scheme for us to use.
-We can have a /collections/generic/ folder with a list module in it.
+在组织方面，命名空间对于在全局作用域内对逻辑上相关的对象和类型进行分组是很便利的。
+例如，在C#里，你会从`System.Collections`里找到所有集合的类型。
+通过将类型有层次地组织在命名空间里，可以方便用户找到与使用那些类型。
+然而，模块本身已经存在于文件系统之中，这是必须的。
+我们必须通过路径和文件名找到它们，这已经提供了一种逻辑上的组织形式。
+我们可以创建`/collections/generic/`文件夹，把相应模块放在这里面。
 
-Namespaces are important to avoid naming collisions in the global scope.
-For example, you might have `My.Application.Customer.AddForm` and `My.Application.Order.AddForm` -- two types with the same name, but a different namespace.
-This, however, is not an issue with modules.
-Within a module, there's no plausible reason to have two objects with the same name.
-From the consumption side, the consumer of any given module gets to pick the name that they will use to refer to the module, so accidental naming conflicts are impossible.
+命名空间对解决全局作用域里命名冲突来说是很重要的。
+比如，你可以有一个`My.Application.Customer.AddForm`和`My.Application.Order.AddForm` -- 两个类型的名字相同，但命名空间不同。
+然而，这对于模块来说却不是一个问题。
+在一个模块里，没有理由两个对象拥有同一个名字。
+从模块的使用角度来说，使用者会挑出他们用来引用模块的名字，所以也没有理由发生重名的情况。
 
-> For more discussion about modules and namespaces see [Namespaces and Modules](./Namespaces and Modules.md).
+> 更多关于模块和命名空间的资料查看[命名空间和模块](./Namespaces and Modules.md)
 
-## Red Flags
+## 危险信号
 
-All of the following are red flags for module structuring. Double-check that you're not trying to namespace your external modules if any of these apply to your files:
+以下均为模块结构上的危险信号。重新检查以确保你没有在对模块使用命名空间：
 
-* A file whose only top-level declaration is `export namespace Foo { ... }` (remove `Foo` and move everything 'up' a level)
-* A file that has a single `export class` or `export function` (consider using `export default`)
-* Multiple files that have the same `export namespace Foo {` at top-level (don't think that these are going to combine into one `Foo`!)
+* 文件的顶层声明是`export namespace Foo { ... }` （删除`Foo`并把所有内容向上层移动一层）
+* 文件只有一个`export class`或`export function` （考虑使用`export default`）
+* 多个文件的顶层具有同样的`export namespace Foo {` （不要以为这些会合并到一个`Foo`中！）
+
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript

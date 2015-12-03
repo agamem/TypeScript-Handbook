@@ -1,16 +1,16 @@
-# Introduction
+# 介绍
 
-Functions are the fundamental building block of any applications in JavaScript.
-They're how you build up layers of abstraction, mimicking classes, information hiding, and modules.
-In TypeScript, while there are classes, namespaces, and modules, function still play the key role in describing how to *do* things.
-TypeScript also adds some new capabilities to the standard JavaScript functions to make them easier to work with.
+函数是JavaScript应用程序的基础。
+它帮助你实现抽象层，模拟类，信息隐藏和模块。
+在TypeScript里，虽然已经支持类，命名空间和模块，但函数仍然是主要的定义*行为*的地方。
+TypeScript为JavaScript函数添加了额外的功能，让我们可以更容易的使用。
 
-# Functions
+# 函数
 
-To begin, just as in JavaScript, TypeScript functions can be created both as a named function or as an anonymous function.
-This allows you to choose the most appropriate approach for your application, whether you're building a list of functions in an API or a one-off function to hand off to another function.
+和JavaScript一样，TypeScript函数可以创建有名字的函数和匿名函数。
+你可以随意选择适合应用程序的方式，不论是定义一系列API函数还是只使用一次的函数。
 
-To quickly recap what these two approaches look like in JavaScript:
+通过下面的例子可以迅速回想起这两种JavaScript中的函数：
 
 ```ts
 // Named function
@@ -19,12 +19,12 @@ function add(x, y) {
 }
 
 // Anonymous function
-var myAdd = function(x, y) { return x+y; };
+var myAdd = function(x, y) { return x + y; };
 ```
 
-Just as in JavaScript, functions can refer to variables outside of the function body.
-When they do so, they're said to `capture` these variables.
-While understanding how this works, and the trade-offs when using this technique, are outside of the scope of this article, having a firm understanding how this mechanic is an important piece of working with JavaScript and TypeScript.
+在JavaScript里，函数可以可以使用函数体外部的变量。
+当函数这么做时，我们说它‘捕获’了这些变量。
+至于为什么可以这样做以及其中的利弊超出了本文的范围，但是深刻理解这个机制对学习JavaScript和TypeScript会很有帮助。
 
 ```ts
 var z = 100;
@@ -34,11 +34,11 @@ function addToZ(x, y) {
 }
 ```
 
-# Function Types
+# 函数类型
 
-## Typing the function
+## 为函数定义类型
 
-Let's add types to our simple examples from earlier:
+让我们为上面那个函数添加类型：
 
 ```ts
 function add(x: number, y: number): number {
@@ -48,61 +48,61 @@ function add(x: number, y: number): number {
 var myAdd = function(x: number, y: number): number { return x+y; };
 ```
 
-We can add types to each of the parameters and then to the function itself to add a return type.
-TypeScript can figure the return type out by looking at the return statements, so we can also optionally leave this off in many cases.
+我们可以给每个参数添加类型之后再为函数本身添加返回值类型。
+TypeScript能够根据返回语句自动推断出返回值类型，因此我们通常省略它。
 
-## Writing the function type
+## 书写完整函数类型
 
-Now that we've typed the function, let's write the full type of the function out by looking at the each piece of the function type.
+现在我们已经为函数指定了类型，下面让我们写出函数的完整类型。
 
 ```ts
-var myAdd: (x: number, y: number)=>number =
+var myAdd: (x:number, y:number)=>number =
     function(x: number, y: number): number { return x+y; };
 ```
 
-A function's type has the same two parts: the type of the arguments and the return type.
-When writing out the whole function type, both parts are required.
-We write out the parameter types just like a parameter list, giving each parameter a name and a type.
-This name is just to help with readability.
-We could have instead written:
+函数类型包含两部分：参数类型和返回值类型。
+当写出完整函数类型的时候，这两部分都是需要的。
+我们以参数列表的形式写出参数类型，为每个参数指定一个名字和类型。
+这个名字只是为了增加可读性。
+我们也可以这么写：
 
 ```ts
 var myAdd: (baseValue:number, increment:number) => number =
     function(x: number, y: number): number { return x + y; };
 ```
 
-As long as the parameter types line up, it's considered a valid type for the function, regardless of the names you give the parameters in the function type.
+只要参数类型是匹配的，那么就认为它是有效的函数类型，而不在乎参数名是否正确。
 
-The second part is the return type.
-We make it clear which is the return type by using a fat arrow (`=>`) between the parameters and the return type.
-As mentioned before, this is a required part of the function type, so if the function doesn't return a value, you would use `void` instead of leaving it off.
+第二部分是返回值类型。
+对于返回值，我们在函数和返回值类型之前使用(`=>`)符号，使之清晰明了。
+如之前提到的，返回值类型是函数类型的必要部分，如果函数没有返回任何值，你也必须指定返回值类型为`void`而不能留空。
 
-Of note, only the parameters and the return type make up the function type.
-Captured variables are not reflected in the type.
-In effect, captured variables are part of the 'hidden state' of any function and do not make up its API.
+函数的类型只是由参数类型和返回值组成的。
+函数中使用的捕获变量不会体现在类型里。
+实际上，这些变量是函数的隐藏状态并不是组成API的一部分。
 
-## Inferring the types
+## 推断类型
 
-In playing with the example, you may notice that the TypeScript compiler can figure out the type if you have types on one side of the equation but not the other:
+尝试这个例子的时候，你会发现如果你在赋值语句的一边指定了类型但是另一边没有类型的话，TypeScript编译器会自动识别出类型：
 
 ```ts
 // myAdd has the full function type
-var myAdd = function(x: number, y: number): number { return  x + y; };
+var myAdd = function(x: number, y: number): number { return x + y; };
 
 // The parameters `x` and `y` have the type number
 var myAdd: (baseValue:number, increment:number) => number =
     function(x, y) { return x + y; };
 ```
 
-This is called "contextual typing", a form of type inference.
-This helps cut down on the amount of effort to keep your program typed.
+这叫做“按上下文归类”，是类型推论的一种。
+它帮助我们更好地为程序指定类型。
 
-# Optional and Default Parameters
+# 可选参数和默认参数
 
-In TypeScript, every parameter is assumed to be required by the function.
-This doesn't mean that it can't be given `null` or `undefined`, but rather, when the function is called the compiler will check that the user has provided a value for each parameter.
-The compiler also assumes that these parameters are the only parameters that will be passed to the function.
-In short, the number of arguments given to a function has to match the number of parameters the function expects.
+TypeScript里的每个函数参数都是必须的。
+这不是指不能传递`null`或`undefined`作为参数，而是说编译器检查用户是否为每个参数都传入了值。
+编译器还会假设只有这些参数会被传递进函数。
+简短地说，传递给一个函数的参数个数必须与函数期望的参数个数一致。
 
 ```ts
 function buildName(firstName: string, lastName: string) {
@@ -114,10 +114,10 @@ var result2 = buildName("Bob", "Adams", "Sr.");  // error, too many parameters
 var result3 = buildName("Bob", "Adams");         // ah, just right
 ```
 
-In JavaScript, every parameter is optional, and users may leave them off as they see fit.
-When they do, their value is `undefined`.
-We can get this functionality in TypeScript by adding a `?` to the end of parameters we want to be optional.
-For example, let's say we want the last name parameter from above to be optional:
+JavaScript里，每个参数都是可选的，可传可不传。
+没传参的时候，它的值就是undefined。
+在TypeScript里我们可以在参数名旁使用`?`实现可选参数的功能。
+比如，我们想让last name是可选的：
 
 ```ts
 function buildName(firstName: string, lastName?: string) {
@@ -127,17 +127,17 @@ function buildName(firstName: string, lastName?: string) {
         return firstName;
 }
 
-var result1 = buildName("Bob");                  // works correctly now
+var result1 = buildName("Bob");  // works correctly now
 var result2 = buildName("Bob", "Adams", "Sr.");  // error, too many parameters
-var result3 = buildName("Bob", "Adams");         // ah, just right
+var result3 = buildName("Bob", "Adams");  // ah, just right
 ```
 
-Any optional parameters must follow required parameters.
-Had we wanted to make the first name optional rather than the last name, we would need to change the order of parameters in the function, putting the first name last in the list.
+可选参数必须在必须跟在必须参数后面。
+如果上例我们想让first name是可选的，那么就必须调整它们的位置，把first name放在后面。
 
-In TypeScript, we can also set a value that a parameter will be assigned if the user does not provide one, or if the user passes `undefined` in its place.
-These are called default-initialized parameters.
-Let's take the previous example and default the last name to `"Smith"`.
+在TypeScript里，我们也可以为参数提供一个默认值当用户没有传递这个参数或传递的值是`undefined`时。
+它们叫做有默认初始化值的参数。
+让我们修改上例，把last name的默认值设置为`"Smith"`。
 
 ```ts
 function buildName(firstName: string, lastName = "Smith") {
@@ -145,13 +145,13 @@ function buildName(firstName: string, lastName = "Smith") {
 }
 
 var result1 = buildName("Bob");                  // works correctly now, returns "Bob Smith"
-var result2 = buildName("Bob", undefined);       // still works, also returns "Bob Smith"
+var result2 = buildName("Bob, undefined");       // still works, also returns "Bob Smith"
 var result3 = buildName("Bob", "Adams", "Sr.");  // error, too many parameters
 var result4 = buildName("Bob", "Adams");         // ah, just right
 ```
 
-Default-initialized parameters that come after all required parameters are treated as optional, and just like optional parameters, can be omitted when calling their respective function.
-This means optional parameters and trailing default parameters will share commonality in their types, so both
+在所有必须参数后面的带默认初始化的参数都是可选的，与可选参数一样，在调用函数的时候可以省略。
+也就是说可选参数与末尾的默认参数共享参数类型。
 
 ```ts
 function buildName(firstName: string, lastName?: string) {
@@ -159,7 +159,7 @@ function buildName(firstName: string, lastName?: string) {
 }
 ```
 
-and
+和
 
 ```ts
 function buildName(firstName: string, lastName = "Smith") {
@@ -167,12 +167,12 @@ function buildName(firstName: string, lastName = "Smith") {
 }
 ```
 
-share the same type `(firstName: string, lastName?: string) => string`.
-The default value of `lastName` disappears in the type, only leaving behind the fact that the parameter is optional.
+共享同样的类型`(firstName: string, lastName?: string) => string`。
+默认参数的默认值消失了，只保留了它是一个可选参数的信息。
 
-Unlike plain optional parameters, default-initialized parameters don't *need* to occur after required parameters.
-If a default-initialized parameter comes before a required parameter, users need to explicitly pass `undefined` to get the default initialized value.
-For example, we could write our last example with only a default initializer on `firstName`:
+与普通可选参数不同的是，带默认值的参数不需要放在必须参数的后面。
+如果带默认值的参数出现在必须参数前面，用户必须明确的传入`undefined`值来获得默认值。
+例如，我们重写最后一个例子，让`firstName`是带默认值的参数：
 
 ```ts
 function buildName(firstName = "Will", lastName: string) {
@@ -185,48 +185,48 @@ var result3 = buildName("Bob", "Adams");         // okay and returns "Bob Adams"
 var result4 = buildName(undefined, "Adams");     // okay and returns "Will Adams"
 ```
 
-# Rest Parameters
+# 剩余参数
 
-Required, optional, and default parameters all have one thing in common: they talk about one parameter at a time.
-Sometimes, you want to work with multiple parameters as a group, or you may not know how many parameters a function will ultimately take.
-In JavaScript, you can work with the arguments directly using the `arguments` variable that is visible inside every function body.
+必要参数，默认参数和可选参数有个共同点：它们表示某一个参数。
+有时，你想同时操作多个参数，或者你并不知道会有多少参数传递进来。
+在JavaScript里，你可以使用`arguments`来访问所有传入的参数。
 
-In TypeScript, you can gather these arguments together into a variable:
+在TypeScript里，你可以把所有参数收集到一个变量里：
 
 ```ts
 function buildName(firstName: string, ...restOfName: string[]) {
-    return firstName + " " + restOfName.join(" ");
+  return firstName + " " + restOfName.join(" ");
 }
 
 var employeeName = buildName("Joseph", "Samuel", "Lucas", "MacKinzie");
 ```
 
-*Rest parameters* are treated as a boundless number of optional parameters.
-When passing arguments for a rest parameter, can use as many as you want; you can even pass none.
-The compiler will build an array of the arguments passed in with the name given after the ellipsis (`...`), allowing you to use it in your function.
+剩余参数会被当做个数不限的可选参数。
+可以一个都没有，同样也可以有任意个。
+编译器创建参数数组，名字是你在省略号（`...`）后面给定的名字，你可以在函数体内使用这个数组。
 
-The ellipsis is also used in the type of the function with rest parameters:
+这个省略号也会在带有剩余参数的函数类型定义上使用到：
 
 ```ts
 function buildName(firstName: string, ...restOfName: string[]) {
-    return firstName + " " + restOfName.join(" ");
+  return firstName + " " + restOfName.join(" ");
 }
 
 var buildNameFun: (fname: string, ...rest: string[]) => string = buildName;
 ```
 
-# Lambdas and using `this`
+# Lambda表达式和使用`this`
 
-How `this` works in JavaScript functions is a common theme in programmers coming to JavaScript.
-Indeed, learning how to use it is something of a rite of passage as developers become more accustomed to working in JavaScript.
-Since TypeScript is a superset of JavaScript, TypeScript developers also need to learn how to use `this` and how to spot when it's not being used correctly.
-A whole article could be written on how to use `this` in JavaScript, and many have. Here, we'll focus on some of the basics.
+JavaScript里`this`的工作机制对JavaScript程序员来说已经是老生常谈了。
+的确，学会如何使用它绝对是JavaScript编程中的一件大事。
+由于TypeScript是JavaScript的超集，TypeScript程序员也需要弄清`this`工作机制并且当有bug的时候能够找出错误所在。
+`this`的工作机制可以单独写一本书了，并确已有人这么做了。在这里，我们只介绍一些基础知识。
 
-In JavaScript, `this` is a variable that's set when a function is called.
-This makes it a very powerful and flexible feature, but it comes at the cost of always having to know about the context that a function is executing in.
-This can be notoriously confusing when, for instance, a function is used as a callback.
+JavaScript里，`this`的值在函数被调用的时候才会指定。
+这是个既强大又灵活的特点，但是你需要花点时间弄清楚函数调用的上下文是什么。
+众所周知这不是一件很简单的事，特别是函数当做回调函数使用的时候。
 
-Let's look at an example:
+下面看一个例子：
 
 ```ts
 var deck = {
@@ -236,7 +236,7 @@ var deck = {
         return function() {
             var pickedCard = Math.floor(Math.random() * 52);
             var pickedSuit = Math.floor(pickedCard / 13);
-
+      
             return {suit: this.suits[pickedSuit], card: pickedCard % 13};
         }
     }
@@ -248,15 +248,15 @@ var pickedCard = cardPicker();
 alert("card: " + pickedCard.card + " of " + pickedCard.suit);
 ```
 
-If we tried to run the example, we would get an error instead of the expected alert box.
-This is because the `this` being used in the function created by `createCardPicker` will be set to `window` instead of our `deck` object.
-This happens as a result of calling `cardPicker()`. Here, there is no dynamic binding for `this` other than Window. (note: under strict mode, this will be undefined rather than window).
+如果我们运行这个程序，会发现它并没有弹出对话框而是报错了。
+因为`createCardPicker`返回的函数里的`this`被设置成了`window`而不是`deck`对象。
+当你调用`cardPicker()`时会发生这种情况。这里没有对`this`进行动态绑定因此为window。（注意在严格模式下，会是undefined而不是window）。
 
-We can fix this by making sure the function is bound to the correct `this` before we return the function to be used later.
-This way, regardless of how its later used, it will still be able to see the original `deck` object.
+为了解决这个问题，我们可以在函数被返回时就绑好正确的`this`。
+这样的话，无论之后怎么使用它，都会引用绑定的‘deck’对象。
 
-To fix this, we switch the function expression to use the arrow syntax (`() => {}`) rather than the JavaScript function expression.
-This will automatically capture the `this` available when the function is created rather than when it is invoked:
+我们把函数表达式变为使用lambda表达式（ () => {} ）。
+这样就会在函数创建的时候就指定了‘this’值，而不是在函数调用的时候。
 
 ```ts
 var deck = {
@@ -267,7 +267,7 @@ var deck = {
         return () => {
             var pickedCard = Math.floor(Math.random() * 52);
             var pickedSuit = Math.floor(pickedCard / 13);
-
+      
             return {suit: this.suits[pickedSuit], card: pickedCard % 13};
         }
     }
@@ -279,12 +279,12 @@ var pickedCard = cardPicker();
 alert("card: " + pickedCard.card + " of " + pickedCard.suit);
 ```
 
-For more information on ways to think about `this`, you can read Yehuda Katz's [Understanding JavaScript Function Invocation and "this"](http://yehudakatz.com/2011/08/11/understanding-javascript-function-invocation-and-this/).
+为了解更多关于`this`的信息，请阅读Yahuda Katz的[Understanding JavaScript Function Invocation and "this"](http://yehudakatz.com/2011/08/11/understanding-javascript-function-invocation-and-this/)。
 
-# Overloads
+# 重载
 
-JavaScript is inherently a very dynamic language.
-It's not uncommon for a single JavaScript function to return different types of objects based on the shape of the arguments passed in.
+JavaScript本身是个动态语言。
+JavaScript里函数根据传入不同的参数而返回不同类型的数据是很常见的。
 
 ```ts
 var suits = ["hearts", "spades", "clubs", "diamonds"];
@@ -311,14 +311,14 @@ var pickedCard2 = pickCard(15);
 alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
 ```
 
-Here the `pickCard` function will return two different things based on what the user has passed in.
-If the users passes in an object that represents the deck, the function will pick the card.
-If the user picks the card, we tell them which card they've picked.
-But how do we describe this to the type system?
+`pickCard`方法根据传入参数的不同会返回两种不同的类型。
+如果传入的是代表纸牌的对象，函数作用是从中抓一张牌。
+如果用户想抓牌，我们告诉他抓到了什么牌。
+但是这怎么在类型系统里表示呢。
 
-The answer is to supply multiple function types for the same function as a list of overloads.
-This list is what the compiler will use to resolve function calls.
-Let's create a list of overloads that describe what our `pickCard` accepts and what it returns.
+方法是为同一个函数提供多个函数类型定义来进行函数重载。
+编译器会根据这个列表去处理函数的调用。
+下面我们来重载`pickCard`函数。
 
 ```ts
 var suits = ["hearts", "spades", "clubs", "diamonds"];
@@ -347,13 +347,15 @@ var pickedCard2 = pickCard(15);
 alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
 ```
 
-With this change, the overloads now give us type-checked calls to the `pickCard` function.
+这样改变后，重载的`pickCard`函数在调用的时候会进行正确的类型检查。
 
-In order for the compiler to pick the correct typecheck, it follows a similar process to the underlying JavaScript.
-It looks at the overload list, and proceeding with the first overload attempts to call the function with the provided parameters.
-If it finds a match, it picks this overload as the correct overload.
-For this reason, its customary to order overloads from most specific to least specific.
+为了让编译器能够选择正确的检查类型，它与JavaScript里的处理流程相似。
+它查找重载列表，尝试使用第一个重载定义。
+如果匹配的话就使用这个。
+因此，在定义重载的时候，一定要把最精确的定义放在最前面。
 
-Note that the `function pickCard(x): any` piece is not part of the overload list, so it only has two overloads: one that takes an object and one that takes a number.
-Calling `pickCard` with any other parameter types would cause an error.
+注意，`function pickCard(x): any`并不是重载列表的一部分，因此这里只有两个重载：一个是接收对象另一个接收数字。
+以其它参数调用`pickCard`会产生错误。
 
+# 翻译
+- zhongsp   https://github.com/zhongsp/TypeScript
