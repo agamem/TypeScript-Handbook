@@ -2,7 +2,7 @@
 
 事情是这样的，我想搜索 `TypeScript 中文教程`，结果在 https://www.baidu.com ， https://cn.bing.com ，上都找不到官方的翻译，也没有一个像样的翻译（搜索的时间是2015-12-02），可怜我们无法使用google，所以就想去自己翻译官方的 TypeScript-Handbook。
 
-于是我Fork了官方的库 https://github.com/Microsoft/TypeScript-Handbook , 到我的库中 https://github.com/MyErpSoft/TypeScript-Handbook ,我当然不能直接修改他们的文件，于是我的做法建立子目录 zh-CHS (https://github.com/MyErpSoft/TypeScript-Handbook/tree/master/pages/zh-CHS)，梦想着哪天官方是不是 合并我的变更呢，哈哈，美美的做着白日梦。
+于是我Fork了官方的库 https://github.com/Microsoft/TypeScript-Handbook , 到我的库中 https://github.com/MyErpSoft/TypeScript-Handbook ,我当然不能直接修改他们的文件，于是我的做法建立子目录 zh-CHS ( https://github.com/MyErpSoft/TypeScript-Handbook/tree/master/pages/zh-CHS )，梦想着哪天官方是不是 合并我的变更呢，哈哈，美美的做着白日梦。
 
 可是在翻译不到几个小时之后呢，觉得不甘心，既然我放在github上，那是不是在 https://GitHub.com 可以搜索到别人的翻译呢？大家都爱github吗，对吧？ 于是在github上搜 `TypeScript Handbook`，果然有，翻译的比较完整的有：
 - https://github.com/oyyd/typescript-handbook-zh 完整
