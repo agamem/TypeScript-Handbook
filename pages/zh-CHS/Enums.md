@@ -120,3 +120,7 @@ declare enum Enum {
 
 # 翻译
 - zhongsp   https://github.com/zhongsp/TypeScript
+
+[上一章](./Basic%20Types.md)
+[目录](../../content.md)
+[下一章](./Interfaces.md)
