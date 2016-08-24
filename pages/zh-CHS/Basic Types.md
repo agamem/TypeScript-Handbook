@@ -174,5 +174,5 @@ var unusable: void = undefined;
 - ntesmail  https://github.com/ntesmail/Typescript-Handbook
 - 编写人生  https://github.com/MyErpSoft/TypeScript-Handbook
 
-[目录](https://github.com/agamem/TypeScript-Handbook/blob/master/content.md)
+[目录](../../content.md)
 [下一章](./Enums.md)
